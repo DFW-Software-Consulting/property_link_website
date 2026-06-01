@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Property Link
 
-## Getting Started
+Web app for Property Link, built on a modern full-stack TypeScript setup.
 
-First, run the development server:
+## Stack
+
+| Concern        | Choice                                    |
+| -------------- | ----------------------------------------- |
+| Framework      | Next.js 16 (App Router)                   |
+| UI             | React 19, ShadCN UI, Tailwind CSS v4      |
+| Language       | TypeScript (strict)                       |
+| Server state   | TanStack Query                            |
+| Forms          | react-hook-form + Zod                     |
+| Validation     | Zod (shared client/server schemas)        |
+| ORM / Database | Prisma 7 (pg driver adapter) + PostgreSQL |
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 20+
+- Docker (for the local PostgreSQL database)
+
+### Setup
 
 ```bash
+# 1. Install dependencies (also generates the Prisma client)
+npm install
+
+# 2. Configure environment
+cp .env.example .env
+
+# 3. Start PostgreSQL (host port 5434 -> container 5432)
+docker compose up -d
+
+# 4. Create the database schema
+npm run db:push
+
+# 5. (Optional) Seed sample data
+npm run db:seed
+
+# 6. Start the dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000), then visit `/items` for a
+demo feature that exercises the whole stack: a Prisma-backed API route, data
+fetched with TanStack Query, and a react-hook-form + Zod form validated by the
+same schema on the client and the server.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Script                | Description                            |
+| --------------------- | -------------------------------------- |
+| `npm run dev`         | Start the dev server                   |
+| `npm run build`       | Production build                       |
+| `npm run start`       | Run the production build               |
+| `npm run lint`        | Lint with ESLint                       |
+| `npm run db:push`     | Sync the Prisma schema to the database |
+| `npm run db:migrate`  | Create and apply a migration           |
+| `npm run db:seed`     | Seed sample data                       |
+| `npm run db:studio`   | Open Prisma Studio                     |
+| `npm run db:generate` | Regenerate the Prisma client           |
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+prisma/
+  schema.prisma        # Item demo model
+  seed.ts              # Sample data
+src/
+  app/
+    api/items/route.ts # GET/POST items (Prisma + Zod)
+    items/page.tsx     # Demo feature page
+    layout.tsx         # Wraps the app in Providers + Toaster
+    page.tsx           # Home
+  components/
+    items/             # ItemList + CreateItemForm
+    providers.tsx      # TanStack Query provider
+    ui/                # ShadCN components
+  lib/
+    db.ts              # Prisma client singleton (pg adapter)
+    env.ts             # Zod-validated environment
+    get-query-client.ts
+    schemas/item.ts    # Shared Zod schema
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The `Item` model is a generic placeholder that proves the stack works
+end to end — replace it with the real property domain models.
