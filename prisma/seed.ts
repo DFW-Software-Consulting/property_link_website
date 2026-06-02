@@ -9,18 +9,31 @@ if (!connectionString) {
 
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
 
-const items = [
-  { name: "Lakeside Villa", description: "4-bed waterfront home with a private dock." },
-  { name: "Downtown Loft", description: "Open-plan loft in the arts district." },
-  { name: "Suburban Bungalow", description: "Cozy 3-bed with a large backyard." },
+const inquiries = [
+  {
+    name: "Jordan Avery",
+    email: "jordan.avery@example.com",
+    phone: "212-555-0144",
+    inquiryType: "SHORT_TERM" as const,
+    message:
+      "Relocating for a 3-month project and looking for a furnished 1-bed in Hell's Kitchen starting next month.",
+  },
+  {
+    name: "Priya Nair",
+    email: "priya.nair@example.com",
+    inquiryType: "CORPORATE" as const,
+    company: "Northwind Productions",
+    message:
+      "We need corporate housing for 4 crew members for an upcoming production. Can you share availability?",
+  },
 ];
 
 async function main() {
-  await prisma.item.deleteMany();
-  for (const data of items) {
-    await prisma.item.create({ data });
+  await prisma.contactInquiry.deleteMany();
+  for (const data of inquiries) {
+    await prisma.contactInquiry.create({ data });
   }
-  console.log(`Seeded ${items.length} items.`);
+  console.log(`Seeded ${inquiries.length} contact inquiries.`);
 }
 
 main()

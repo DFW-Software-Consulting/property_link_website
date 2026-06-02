@@ -12,13 +12,26 @@ datasource db {
   provider = "postgresql"
 }
 
-/// A generic demo model that exercises the full stack
-/// (Prisma -> API route -> TanStack Query -> Zod-validated form).
-/// Replace with the real domain models for the property site.
-model Item {
-  id          String   @id @default(cuid())
+enum InquiryType {
+  SHORT_TERM
+  LONG_TERM
+  CORPORATE
+  GENERAL
+}
+
+/// A contact-form submission. Persisted from `POST /api/contact`, which also
+/// fires a notification email.
+model ContactInquiry {
+  id          String      @id @default(cuid())
   name        String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  email       String
+  phone       String?
+  inquiryType InquiryType @default(GENERAL)
+  company     String?
+  moveInDate  DateTime?
+  message     String
+  createdAt   DateTime    @default(now())
+
+  @@index([createdAt])
+  @@index([email])
 }
