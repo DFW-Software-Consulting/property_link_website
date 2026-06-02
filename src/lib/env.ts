@@ -1,8 +1,7 @@
 import { z } from "zod";
 
 /**
- * Server-side environment validation. Imported by `lib/db.ts`, so an invalid
- * or missing `DATABASE_URL` fails fast at startup with a clear message.
+ * Server-side environment validation.
  * Do not import this from Client Components.
  *
  * Email vars are OPTIONAL here: the app/builds must not hard-fail when SMTP
@@ -10,8 +9,6 @@ import { z } from "zod";
  * errors when an email is actually attempted.
  */
 const envSchema = z.object({
-  DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
-
   // Contact-form email notifications (Nodemailer / SMTP). All required together
   // to enable sending — see lib/email/mailer.ts `isEmailConfigured()`.
   SMTP_HOST: z.string().optional(),
