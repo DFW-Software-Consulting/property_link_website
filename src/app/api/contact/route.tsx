@@ -1,27 +1,30 @@
 import { NextResponse } from "next/server";
 import { render } from "@react-email/render";
-import { db } from "@/lib/db";
 import {
   contactInquirySchema,
   inquiryTypeLabels,
-  type InquiryType,
 } from "@/lib/schemas/contact";
 import { isEmailConfigured, sendContactNotification } from "@/lib/email/mailer";
 import { ContactNotificationEmail } from "@/emails/contact-notification";
 
-// Map the zod (snake_case) enum to the Prisma (SCREAMING_CASE) enum.
-const prismaInquiryType: Record<
-  InquiryType,
-  "SHORT_TERM" | "LONG_TERM" | "CORPORATE" | "GENERAL"
-> = {
-  short_term: "SHORT_TERM",
-  long_term: "LONG_TERM",
-  corporate: "CORPORATE",
-  general: "GENERAL",
-};
+function generateId(): string {
+  return crypto.randomUUID();
+}
 
-// Lightweight in-memory rate limit per IP. Resets on restart and is per-instance
-// — swap for Redis/Upstash for durable, multi-instance production limiting.
+interface StoredInquiry {
+  id: string;
+  name: string;
+  email: string;
+  inquiryType: string;
+  message: string;
+  phone: string | null;
+  company: string | null;
+  moveInDate: string | null;
+  createdAt: string;
+}
+
+const inquiries = new Map<string, StoredInquiry>();
+
 const RATE_LIMIT = 5;
 const WINDOW_MS = 10 * 60 * 1000;
 const hits = new Map<string, { count: number; resetAt: number }>();
@@ -51,7 +54,6 @@ export async function POST(request: Request) {
 
   const body: unknown = await request.json().catch(() => null);
 
-  // Honeypot: bots fill the hidden `website` field. Pretend success and drop.
   const honeypot = readString(body, "website");
   if (honeypot && honeypot.trim() !== "") {
     return NextResponse.json({ ok: true }, { status: 200 });
@@ -73,38 +75,30 @@ export async function POST(request: Request) {
   }
 
   const data = parsed.data;
-  const phone = data.phone?.trim() ? data.phone.trim() : null;
-  const company = data.company?.trim() ? data.company.trim() : null;
-  const rawMoveIn = data.moveInDate?.trim();
-  const moveInDate =
-    rawMoveIn && !Number.isNaN(new Date(rawMoveIn).getTime())
-      ? new Date(rawMoveIn)
-      : null;
 
-  // 1) Persist — the source of truth. Must succeed.
-  const inquiry = await db.contactInquiry.create({
-    data: {
-      name: data.name.trim(),
-      email: data.email.trim(),
-      phone,
-      inquiryType: prismaInquiryType[data.inquiryType],
-      company,
-      moveInDate,
-      message: data.message.trim(),
-    },
-  });
+  const inquiry: StoredInquiry = {
+    id: generateId(),
+    name: data.name.trim(),
+    email: data.email.trim(),
+    phone: data.phone?.trim() || null,
+    inquiryType: data.inquiryType,
+    company: data.company?.trim() || null,
+    moveInDate: data.moveInDate?.trim() || null,
+    message: data.message.trim(),
+    createdAt: new Date().toISOString(),
+  };
 
-  // 2) Notify by email — best-effort. A transient SMTP failure must NOT lose
-  //    the persisted record, so we log and still return success.
+  inquiries.set(inquiry.id, inquiry);
+
   if (isEmailConfigured()) {
     const element = (
       <ContactNotificationEmail
         name={inquiry.name}
         email={inquiry.email}
-        phone={phone ?? undefined}
+        phone={inquiry.phone ?? undefined}
         inquiryType={data.inquiryType}
-        company={company ?? undefined}
-        moveInDate={rawMoveIn || undefined}
+        company={inquiry.company ?? undefined}
+        moveInDate={inquiry.moveInDate ?? undefined}
         message={inquiry.message}
       />
     );
@@ -124,7 +118,7 @@ export async function POST(request: Request) {
     }
   } else {
     console.warn(
-      "[contact] email not configured — inquiry persisted without notification.",
+      "[contact] email not configured — inquiry stored in memory without notification.",
     );
   }
 

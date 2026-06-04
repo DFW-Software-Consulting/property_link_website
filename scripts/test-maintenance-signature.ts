@@ -1,4 +1,3 @@
-import "dotenv/config";
 import assert from "node:assert/strict";
 import {
   buildMaintenancePayload,
@@ -121,7 +120,9 @@ console.log(`\n${passed} checks passed.\n`);
 async function maybeSendTestEmail() {
   if (process.env.SEND_TEST_EMAIL !== "1") {
     console.log(
-      "Skipping live email send (set SEND_TEST_EMAIL=1 with SMTP/intake env vars to send one).",
+      "Skipping live email send. To send one, provide env vars on the command line, e.g.:\n" +
+        "  SEND_TEST_EMAIL=1 SMTP_HOST=… SMTP_PORT=… SMTP_USER=… SMTP_PASS=… \\\n" +
+        "  MAINTENANCE_MAILBOX=… FORM_FROM_ADDRESS=… npm run test:maintenance",
     );
     return;
   }
