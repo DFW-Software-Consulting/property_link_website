@@ -19,6 +19,21 @@ const envSchema = z.object({
   CONTACT_TO: z.string().optional(),
   // From header, e.g. "PropertyLink NYC <info@propertylinknyc.com>".
   CONTACT_FROM: z.string().optional(),
+
+  // Maintenance Request intake. Optional at startup; the API route checks them
+  // at request time and refuses to send (rather than producing an unsigned or
+  // misaddressed email) when any are missing. The shared secret MUST be byte
+  // identical to the value configured in the property-management ingest app.
+  MAINTENANCE_INTAKE_SHARED_SECRET: z.string().optional(),
+  // Workspace intake address that receives submissions, e.g. "maintenance@…".
+  MAINTENANCE_MAILBOX: z.string().optional(),
+  // Stable sender the ingest filters on. Reuses SMTP_* for transport.
+  FORM_FROM_ADDRESS: z.string().optional(),
+
+  // Cloudflare Turnstile secret (server-side CAPTCHA verification). When unset,
+  // verification is skipped — production MUST set it. The matching public site
+  // key is read client-side from NEXT_PUBLIC_TURNSTILE_SITE_KEY.
+  TURNSTILE_SECRET_KEY: z.string().optional(),
 });
 
 export const env = envSchema.parse(process.env);
