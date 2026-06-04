@@ -6,44 +6,39 @@ import { env } from "@/lib/env";
  * module only throws when a send is actually attempted without full SMTP config.
  */
 
-type EmailConfig = {
-  host: string;
-  port: number;
-  user: string;
-  pass: string;
-  to: string;
-  from: string;
-};
-
-function getEmailConfig(): EmailConfig | null {
-  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, CONTACT_TO, CONTACT_FROM } =
-    env;
-  if (
-    !SMTP_HOST ||
-    !SMTP_PORT ||
-    !SMTP_USER ||
-    !SMTP_PASS ||
-    !CONTACT_TO ||
-    !CONTACT_FROM
-  ) {
-    return null;
-  }
-  return {
-    host: SMTP_HOST,
-    port: SMTP_PORT,
-    user: SMTP_USER,
-    pass: SMTP_PASS,
-    to: CONTACT_TO,
-    from: CONTACT_FROM,
-  };
-}
-
-/** True when all SMTP/contact env vars are present. */
-export function isEmailConfigured(): boolean {
-  return getEmailConfig() !== null;
-}
-
 let transporter: Transporter | null = null;
+
+/** True when the shared SMTP transport (host/port/user/pass) is configured. */
+function isSmtpConfigured(): boolean {
+  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS } = env;
+  return Boolean(SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASS);
+}
+
+/** Lazily create (and reuse) the SMTP transport. Throws if SMTP is unconfigured. */
+function getTransporter(): Transporter {
+  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS } = env;
+  if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
+    throw new Error(
+      "Email transport is not configured (missing SMTP_* environment variables).",
+    );
+  }
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: SMTP_PORT,
+      secure: SMTP_PORT === 465,
+      auth: { user: SMTP_USER, pass: SMTP_PASS },
+    });
+  }
+  return transporter;
+}
+
+/* --------------------------- contact inquiries --------------------------- */
+
+/** True when SMTP plus the contact to/from addresses are present. */
+export function isEmailConfigured(): boolean {
+  return isSmtpConfigured() && Boolean(env.CONTACT_TO && env.CONTACT_FROM);
+}
 
 type SendParams = {
   subject: string;
@@ -55,28 +50,71 @@ type SendParams = {
 export async function sendContactNotification(
   params: SendParams,
 ): Promise<void> {
-  const config = getEmailConfig();
-  if (!config) {
+  if (!env.CONTACT_TO || !env.CONTACT_FROM) {
     throw new Error(
-      "Email is not configured (missing SMTP_* / CONTACT_* environment variables).",
+      "Email is not configured (missing CONTACT_TO / CONTACT_FROM environment variables).",
     );
   }
 
-  if (!transporter) {
-    transporter = nodemailer.createTransport({
-      host: config.host,
-      port: config.port,
-      secure: config.port === 465,
-      auth: { user: config.user, pass: config.pass },
-    });
-  }
-
-  await transporter.sendMail({
-    from: config.from,
-    to: config.to,
+  await getTransporter().sendMail({
+    from: env.CONTACT_FROM,
+    to: env.CONTACT_TO,
     replyTo: params.replyTo,
     subject: params.subject,
     html: params.html,
     text: params.text,
+  });
+}
+
+/* ------------------------- maintenance requests -------------------------- */
+
+/**
+ * True when everything needed to send AND sign a maintenance request is set:
+ * SMTP transport, the intake mailbox, a stable from-address, and the shared
+ * signing secret. The route refuses to send if this is false.
+ */
+export function isMaintenanceIntakeConfigured(): boolean {
+  return (
+    isSmtpConfigured() &&
+    Boolean(
+      env.MAINTENANCE_MAILBOX &&
+        env.FORM_FROM_ADDRESS &&
+        env.MAINTENANCE_INTAKE_SHARED_SECRET,
+    )
+  );
+}
+
+export type MaintenanceAttachment = {
+  filename: string;
+  content: Buffer;
+  contentType: string;
+};
+
+type SendMaintenanceParams = {
+  subject: string;
+  html: string;
+  text?: string;
+  replyTo?: string;
+  attachments: MaintenanceAttachment[];
+};
+
+export async function sendMaintenanceRequestEmail(
+  params: SendMaintenanceParams,
+): Promise<void> {
+  if (!env.MAINTENANCE_MAILBOX || !env.FORM_FROM_ADDRESS) {
+    throw new Error(
+      "Maintenance intake is not configured (missing MAINTENANCE_MAILBOX / FORM_FROM_ADDRESS).",
+    );
+  }
+
+  await getTransporter().sendMail({
+    // From MUST be the stable address the ingest filters on — never the resident.
+    from: env.FORM_FROM_ADDRESS,
+    to: env.MAINTENANCE_MAILBOX,
+    replyTo: params.replyTo,
+    subject: params.subject,
+    html: params.html,
+    text: params.text,
+    attachments: params.attachments,
   });
 }

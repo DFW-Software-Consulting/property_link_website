@@ -12,6 +12,7 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
+    "test:maintenance": "tsx scripts/test-maintenance-signature.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
