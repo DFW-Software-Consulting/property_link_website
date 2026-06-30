@@ -7,13 +7,14 @@ import { SectionHeading } from "@/components/sections/section-heading";
 import { Container } from "@/components/layout/container";
 import { FeatureCard } from "@/components/marketing/feature-card";
 import { AmenityItem } from "@/components/marketing/amenity-item";
-import { PropertyCard } from "@/components/marketing/property-card";
+import { HomepageBuildings } from "@/components/marketing/homepage-buildings";
 import { TestimonialCard } from "@/components/marketing/testimonial-card";
 import { LogoStrip } from "@/components/marketing/logo-strip";
 import { CtaBand } from "@/components/marketing/cta-band";
 import { amenities } from "@/lib/data/amenities";
-import { properties } from "@/lib/data/properties";
 import { testimonials } from "@/lib/data/testimonials";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   description:
@@ -83,20 +84,7 @@ export default function HomePage() {
         </Container>
       </Section>
 
-      <Section id="properties" className="scroll-mt-16">
-        <Container className="flex flex-col gap-10">
-          <SectionHeading
-            eyebrow="Our buildings"
-            title="Seven buildings, four neighborhoods"
-            description="Every PropertyLink home sits in a building we own across some of Manhattan's most connected neighborhoods."
-          />
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {properties.map((property) => (
-              <PropertyCard key={property.slug} property={property} />
-            ))}
-          </div>
-        </Container>
-      </Section>
+      <HomepageBuildings />
 
       <Section tone="muted">
         <Container className="flex flex-col gap-10">
