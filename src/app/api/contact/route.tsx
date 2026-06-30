@@ -20,6 +20,8 @@ interface StoredInquiry {
   phone: string | null;
   company: string | null;
   moveInDate: string | null;
+  building: string | null;
+  buildingSlug: string | null;
   createdAt: string;
 }
 
@@ -84,6 +86,8 @@ export async function POST(request: Request) {
     inquiryType: data.inquiryType,
     company: data.company?.trim() || null,
     moveInDate: data.moveInDate?.trim() || null,
+    building: data.building?.trim() || null,
+    buildingSlug: data.buildingSlug?.trim() || null,
     message: data.message.trim(),
     createdAt: new Date().toISOString(),
   };
@@ -97,6 +101,7 @@ export async function POST(request: Request) {
         email={inquiry.email}
         phone={inquiry.phone ?? undefined}
         inquiryType={data.inquiryType}
+        building={inquiry.building ?? undefined}
         company={inquiry.company ?? undefined}
         moveInDate={inquiry.moveInDate ?? undefined}
         message={inquiry.message}
@@ -108,7 +113,9 @@ export async function POST(request: Request) {
         render(element, { plainText: true }),
       ]);
       await sendContactNotification({
-        subject: `New ${inquiryTypeLabels[data.inquiryType]} inquiry from ${inquiry.name}`,
+        subject: `New ${inquiryTypeLabels[data.inquiryType]} inquiry from ${inquiry.name}${
+          inquiry.building ? ` — ${inquiry.building}` : ""
+        }`,
         html,
         text,
         replyTo: inquiry.email,

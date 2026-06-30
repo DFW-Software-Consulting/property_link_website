@@ -4,7 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Building2 } from "lucide-react";
 import {
   contactInquirySchema,
   INQUIRY_TYPES,
@@ -62,7 +62,18 @@ async function submitInquiry(values: ContactInquiryInput) {
   return res.json();
 }
 
-export function ContactForm() {
+type ContactFormProps = {
+  /** Prefill when opened from a building page. */
+  building?: string;
+  buildingSlug?: string;
+  initialInquiryType?: InquiryType;
+};
+
+export function ContactForm({
+  building,
+  buildingSlug,
+  initialInquiryType,
+}: ContactFormProps) {
   const {
     register,
     handleSubmit,
@@ -75,10 +86,12 @@ export function ContactForm() {
       name: "",
       email: "",
       phone: "",
-      inquiryType: "general",
+      inquiryType: initialInquiryType ?? "general",
+      building: building ?? "",
+      buildingSlug: buildingSlug ?? "",
       company: "",
       moveInDate: "",
-      message: "",
+      message: building ? `I'm interested in ${building}.` : "",
       consent: false,
       website: "",
     },
@@ -114,6 +127,20 @@ export function ContactForm() {
           {...register("website")}
         />
       </div>
+
+      {/* Property context carried from a building page. */}
+      <input type="hidden" {...register("building")} />
+      <input type="hidden" {...register("buildingSlug")} />
+
+      {building ? (
+        <div className="flex items-center gap-2 rounded-lg bg-secondary/60 px-3 py-2.5 text-sm ring-1 ring-foreground/10">
+          <Building2 aria-hidden className="size-4 shrink-0 text-brand-strong" />
+          <span>
+            Inquiring about{" "}
+            <strong className="font-medium text-foreground">{building}</strong>
+          </span>
+        </div>
+      ) : null}
 
       <div className="grid gap-5 sm:grid-cols-2">
         <Field id="name" label="Name" error={errors.name?.message}>

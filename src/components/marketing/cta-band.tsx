@@ -7,9 +7,11 @@ import { siteConfig } from "@/lib/site-config";
 type CtaBandProps = {
   title?: string;
   description?: string;
+  /** Destination for the primary CTA button (defaults to the contact page). */
+  ctaHref?: string;
 };
 
-export function CtaBand({ title, description }: CtaBandProps) {
+export function CtaBand({ title, description, ctaHref = "/contact" }: CtaBandProps) {
   return (
     <section className="bg-primary text-primary-foreground">
       <Container className="flex flex-col items-center gap-6 py-16 text-center sm:py-20">
@@ -22,7 +24,7 @@ export function CtaBand({ title, description }: CtaBandProps) {
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button
-            render={<Link href="/contact" />}
+            render={<Link href={ctaHref} />}
             nativeButton={false}
             variant="brand"
             size="xl"

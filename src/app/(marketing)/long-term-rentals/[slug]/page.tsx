@@ -80,6 +80,10 @@ export default async function BuildingPage({
     { name: building.name, path: `/long-term-rentals/${building.slug}` },
   ];
 
+  const inquiryHref = `/contact?inquiryType=long_term&building=${encodeURIComponent(
+    building.name,
+  )}&buildingSlug=${encodeURIComponent(building.slug)}`;
+
   return (
     <>
       <JsonLd data={buildingJsonLd(building)} />
@@ -161,6 +165,7 @@ export default async function BuildingPage({
       <CtaBand
         title={`Interested in ${building.name}?`}
         description="Tell us your dates and what you're looking for — we'll confirm availability and respond within one business day."
+        ctaHref={inquiryHref}
       />
     </>
   );

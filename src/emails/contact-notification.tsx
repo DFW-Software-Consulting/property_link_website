@@ -16,6 +16,7 @@ export type ContactNotificationProps = {
   email: string;
   phone?: string;
   inquiryType: InquiryType;
+  building?: string;
   company?: string;
   moveInDate?: string;
   message: string;
@@ -37,6 +38,7 @@ export function ContactNotificationEmail({
   email,
   phone,
   inquiryType,
+  building,
   company,
   moveInDate,
   message,
@@ -69,6 +71,7 @@ export function ContactNotificationEmail({
             {inquiryTypeLabels[inquiryType]}
           </Text>
           <Hr style={{ borderColor: "#e5e7eb" }} />
+          {building ? <Row label="Property" value={building} /> : null}
           <Row label="Name" value={name} />
           <Row label="Email" value={<Link href={`mailto:${email}`}>{email}</Link>} />
           {phone ? (
