@@ -47,6 +47,11 @@ export function breadcrumbJsonLd(items: Crumb[]) {
 
 /** ApartmentComplex node for a building detail page. */
 export function buildingJsonLd(building: CmsBuilding) {
+  // Best-effort ZIP from the free-text address. The full address still lives in
+  // streetAddress — cleanly splitting street/city/state would require the CMS to
+  // expose discrete address fields.
+  const postalCode = building.address.match(/\b\d{5}(?:-\d{4})?\b/)?.[0];
+
   const node: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "ApartmentComplex",
@@ -58,6 +63,7 @@ export function buildingJsonLd(building: CmsBuilding) {
       addressLocality: siteConfig.address.city,
       addressRegion: siteConfig.address.state,
       addressCountry: "US",
+      ...(postalCode ? { postalCode } : {}),
     },
   };
 
