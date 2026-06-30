@@ -14,7 +14,7 @@ import { env } from "@/lib/env";
 import type { CmsBuilding, CmsBuildingSummary } from "./types";
 
 /** How long fetched CMS content is cached before Next revalidates (seconds). */
-const CMS_REVALIDATE_SECONDS = 300;
+const CMS_REVALIDATE_SECONDS = 60;
 
 /**
  * Server-to-server request timeout (ms). Bounds the await so a hung CMS (a

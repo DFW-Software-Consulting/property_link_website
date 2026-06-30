@@ -11,7 +11,7 @@ import { CtaBand } from "@/components/marketing/cta-band";
 import { CmsUnitCard } from "@/components/marketing/cms-unit-card";
 import { cmsImageUrl, getCmsBuilding, listCmsBuildings } from "@/lib/cms/client";
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 export async function generateStaticParams() {
   const buildings = await listCmsBuildings();
