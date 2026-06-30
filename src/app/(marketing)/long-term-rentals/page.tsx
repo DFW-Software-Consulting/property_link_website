@@ -9,7 +9,7 @@ import { CtaBand } from "@/components/marketing/cta-band";
 import { CmsBuildingCard } from "@/components/marketing/cms-building-card";
 import { listCmsBuildings } from "@/lib/cms/client";
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Long-Term Rentals",
