@@ -9,6 +9,15 @@ import { z } from "zod";
  * errors when an email is actually attempted.
  */
 const envSchema = z.object({
+  // Origin of the Emmut public CMS API that powers the Long-Term Rentals pages
+  // (buildings + units). Defaults to production; override for local development,
+  // e.g. CMS_API_URL=http://localhost:3000. Missing OR empty (a common deploy
+  // platform footgun) both fall back to the default rather than failing parse.
+  CMS_API_URL: z.preprocess(
+    (v) => (typeof v === "string" && v.trim() !== "" ? v : "https://emmut.dfwsc.com"),
+    z.string().url(),
+  ),
+
   // Contact-form email notifications (Nodemailer / SMTP). All required together
   // to enable sending — see lib/email/mailer.ts `isEmailConfigured()`.
   SMTP_HOST: z.string().optional(),
