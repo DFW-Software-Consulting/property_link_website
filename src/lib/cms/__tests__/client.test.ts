@@ -33,10 +33,11 @@ afterEach(() => {
 });
 
 describe("cmsImageUrl", () => {
-  it("prepends the CMS origin to a relative path", () => {
-    expect(cmsImageUrl("/api/public/cms/images/abc")).toBe(
-      "https://emmut.dfwsc.com/api/public/cms/images/abc",
-    );
+  it("prepends an absolute origin to a relative path", () => {
+    // Asserted structurally so the test doesn't depend on the ambient
+    // CMS_API_URL (which dev setups override to e.g. http://localhost:3000).
+    const url = cmsImageUrl("/api/public/cms/images/abc");
+    expect(url).toMatch(/^https?:\/\/[^/]+\/api\/public\/cms\/images\/abc$/);
   });
 });
 
