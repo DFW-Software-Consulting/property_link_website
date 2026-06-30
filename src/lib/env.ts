@@ -18,6 +18,11 @@ const envSchema = z.object({
     z.string().url(),
   ),
 
+  // Shared secret for the on-demand revalidation webhook (POST /api/revalidate).
+  // When unset, that route is disabled (returns 503). MUST match the value the
+  // CMS sends when it pings on publish/unpublish.
+  CMS_REVALIDATE_SECRET: z.string().optional(),
+
   // Contact-form email notifications (Nodemailer / SMTP). All required together
   // to enable sending — see lib/email/mailer.ts `isEmailConfigured()`.
   SMTP_HOST: z.string().optional(),
