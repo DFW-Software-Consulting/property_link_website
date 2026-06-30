@@ -8,6 +8,7 @@ import {
   FacebookIcon,
   InstagramIcon,
 } from "@/components/icons/social-icons";
+import { INQUIRY_TYPES, type InquiryType } from "@/lib/schemas/contact";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
@@ -16,7 +17,23 @@ export const metadata: Metadata = {
     "Contact PropertyLink NYC about furnished short-term, long-term, and corporate housing in Manhattan. Call 888-622-0772 or send us a message — we respond within one business day.",
 };
 
-export default function ContactPage() {
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const params = await searchParams;
+  const building =
+    typeof params.building === "string" ? params.building : undefined;
+  const buildingSlug =
+    typeof params.buildingSlug === "string" ? params.buildingSlug : undefined;
+  const requestedType =
+    typeof params.inquiryType === "string" ? params.inquiryType : undefined;
+  const initialInquiryType: InquiryType | undefined =
+    requestedType && (INQUIRY_TYPES as readonly string[]).includes(requestedType)
+      ? (requestedType as InquiryType)
+      : undefined;
+
   return (
     <Section>
       <Container className="flex flex-col gap-10">
@@ -28,7 +45,11 @@ export default function ContactPage() {
         />
 
         <div className="grid gap-10 lg:grid-cols-[1.25fr_1fr]">
-          <ContactForm />
+          <ContactForm
+            building={building}
+            buildingSlug={buildingSlug}
+            initialInquiryType={initialInquiryType}
+          />
 
           <aside className="flex flex-col gap-6">
             <div className="flex flex-col gap-5 rounded-xl bg-secondary/50 p-6 ring-1 ring-foreground/10 sm:p-8">

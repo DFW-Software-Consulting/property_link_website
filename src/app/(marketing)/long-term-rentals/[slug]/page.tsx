@@ -1,14 +1,20 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
-import { ChevronLeft, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Section } from "@/components/sections/section";
 import { SectionHeading } from "@/components/sections/section-heading";
 import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
 import { CtaBand } from "@/components/marketing/cta-band";
 import { CmsUnitCard } from "@/components/marketing/cms-unit-card";
+import { Breadcrumbs } from "@/components/marketing/breadcrumbs";
+import {
+  JsonLd,
+  breadcrumbJsonLd,
+  buildingJsonLd,
+  type Crumb,
+} from "@/lib/seo/json-ld";
 import { cmsImageUrl, getCmsBuilding, listCmsBuildings } from "@/lib/cms/client";
 
 export const revalidate = 60;
@@ -28,12 +34,34 @@ export async function generateMetadata({
   if (!building) return { title: "Property not found" };
 
   const where = building.neighborhood ? `, ${building.neighborhood}` : "";
+  const description =
+    building.description ??
+    `Long-term furnished rentals at ${building.name}${where} — a building PropertyLink owns and manages.`;
+  const path = `/long-term-rentals/${building.slug}`;
+  const ogImages = building.hero
+    ? [
+        {
+          url: cmsImageUrl(building.hero.url),
+          alt: building.hero.alt ?? building.name,
+          ...(building.hero.width && building.hero.height
+            ? { width: building.hero.width, height: building.hero.height }
+            : {}),
+        },
+      ]
+    : undefined;
+
   return {
     title: building.name,
-    description:
-      building.description ??
-      `Long-term furnished rentals at ${building.name}${where} — a building PropertyLink owns and manages.`,
-    alternates: { canonical: `/long-term-rentals/${building.slug}` },
+    description,
+    alternates: { canonical: path },
+    openGraph: {
+      type: "website",
+      title: building.name,
+      description,
+      url: path,
+      ...(ogImages ? { images: ogImages } : {}),
+    },
+    twitter: { card: "summary_large_image", title: building.name, description },
   };
 }
 
@@ -46,8 +74,21 @@ export default async function BuildingPage({
   const building = await getCmsBuilding(slug);
   if (!building) notFound();
 
+  const crumbs: Crumb[] = [
+    { name: "Home", path: "/" },
+    { name: "Long-Term Rentals", path: "/long-term-rentals" },
+    { name: building.name, path: `/long-term-rentals/${building.slug}` },
+  ];
+
+  const inquiryHref = `/contact?inquiryType=long_term&building=${encodeURIComponent(
+    building.name,
+  )}&buildingSlug=${encodeURIComponent(building.slug)}`;
+
   return (
     <>
+      <JsonLd data={buildingJsonLd(building)} />
+      <JsonLd data={breadcrumbJsonLd(crumbs)} />
+
       <section className="relative isolate overflow-hidden bg-primary">
         {building.hero ? (
           <Image
@@ -64,13 +105,6 @@ export default async function BuildingPage({
           aria-hidden
         />
         <Container className="flex flex-col gap-4 py-20 text-primary-foreground sm:py-28">
-          <Link
-            href="/long-term-rentals"
-            className="flex w-fit items-center gap-1 text-sm font-medium text-primary-foreground/80 transition-colors hover:text-primary-foreground"
-          >
-            <ChevronLeft aria-hidden className="size-4" />
-            All long-term rentals
-          </Link>
           {building.neighborhood ? (
             <Badge className="w-fit gap-1 bg-primary-foreground/10 text-primary-foreground ring-1 ring-primary-foreground/20">
               <MapPin aria-hidden />
@@ -86,6 +120,12 @@ export default async function BuildingPage({
           </p>
         </Container>
       </section>
+
+      <div className="border-b border-border/60">
+        <Container className="py-3">
+          <Breadcrumbs items={crumbs} />
+        </Container>
+      </div>
 
       {building.description ? (
         <Section spacing="sm">
@@ -125,6 +165,7 @@ export default async function BuildingPage({
       <CtaBand
         title={`Interested in ${building.name}?`}
         description="Tell us your dates and what you're looking for — we'll confirm availability and respond within one business day."
+        ctaHref={inquiryHref}
       />
     </>
   );

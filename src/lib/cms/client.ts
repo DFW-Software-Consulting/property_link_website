@@ -11,6 +11,10 @@
 
 import { env } from "@/lib/env";
 
+import {
+  cmsBuildingResponseSchema,
+  cmsBuildingsResponseSchema,
+} from "./schema";
 import type { CmsBuilding, CmsBuildingSummary } from "./types";
 
 /** How long fetched CMS content is cached before Next revalidates (seconds). */
@@ -36,9 +40,8 @@ export function cmsImageUrl(relativePath: string): string {
   return `${cmsApiBase()}${relativePath}`;
 }
 
-type Envelope<T> = { data: T };
-
-async function fetchCms<T>(path: string): Promise<T> {
+/** Fetch + check status; returns the raw JSON body (validated by the caller). */
+async function fetchCmsJson(path: string): Promise<unknown> {
   const res = await fetch(`${cmsApiBase()}${path}`, {
     headers: { Accept: "application/json" },
     signal: AbortSignal.timeout(CMS_REQUEST_TIMEOUT_MS),
@@ -47,18 +50,18 @@ async function fetchCms<T>(path: string): Promise<T> {
   if (!res.ok) {
     throw new Error(`CMS request failed (${res.status}) for ${path}`);
   }
-  const json = (await res.json()) as Envelope<T>;
-  return json.data;
+  return res.json();
 }
 
 /**
  * All published buildings, ordered as configured in the CMS. Returns an empty
  * list (never throws) so the listing page and `generateStaticParams` stay
- * resilient when the CMS is unreachable.
+ * resilient when the CMS is unreachable or returns an unexpected shape.
  */
 export async function listCmsBuildings(): Promise<CmsBuildingSummary[]> {
   try {
-    return await fetchCms<CmsBuildingSummary[]>("/api/public/cms/buildings");
+    const json = await fetchCmsJson("/api/public/cms/buildings");
+    return cmsBuildingsResponseSchema.parse(json).data;
   } catch (error) {
     console.error("[cms] failed to list buildings", error);
     return [];
@@ -67,13 +70,14 @@ export async function listCmsBuildings(): Promise<CmsBuildingSummary[]> {
 
 /**
  * A single published building with its published units, or `null` if it does
- * not exist, is unpublished, or the CMS is unreachable.
+ * not exist, is unpublished, the CMS is unreachable, or the shape is invalid.
  */
 export async function getCmsBuilding(slug: string): Promise<CmsBuilding | null> {
   try {
-    return await fetchCms<CmsBuilding>(
+    const json = await fetchCmsJson(
       `/api/public/cms/buildings/${encodeURIComponent(slug)}`,
     );
+    return cmsBuildingResponseSchema.parse(json).data;
   } catch (error) {
     console.error(`[cms] failed to load building "${slug}"`, error);
     return null;
