@@ -8,6 +8,7 @@ import { Container } from "@/components/layout/container";
 import { Badge } from "@/components/ui/badge";
 import { CtaBand } from "@/components/marketing/cta-band";
 import { CmsUnitCard } from "@/components/marketing/cms-unit-card";
+import { BuildingLocation } from "@/components/marketing/building-location";
 import { Breadcrumbs } from "@/components/marketing/breadcrumbs";
 import {
   JsonLd,
@@ -161,6 +162,13 @@ export default async function BuildingPage({
           ) : null}
         </Container>
       </Section>
+
+      <BuildingLocation
+        name={building.name}
+        address={building.address}
+        neighborhood={building.neighborhood}
+        tone={building.description ? "default" : "muted"}
+      />
 
       <CtaBand
         title={`Interested in ${building.name}?`}
