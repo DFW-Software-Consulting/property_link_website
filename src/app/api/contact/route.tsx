@@ -7,26 +7,6 @@ import {
 import { isEmailConfigured, sendContactNotification } from "@/lib/email/mailer";
 import { ContactNotificationEmail } from "@/emails/contact-notification";
 
-function generateId(): string {
-  return crypto.randomUUID();
-}
-
-interface StoredInquiry {
-  id: string;
-  name: string;
-  email: string;
-  inquiryType: string;
-  message: string;
-  phone: string | null;
-  company: string | null;
-  moveInDate: string | null;
-  building: string | null;
-  buildingSlug: string | null;
-  createdAt: string;
-}
-
-const inquiries = new Map<string, StoredInquiry>();
-
 const RATE_LIMIT = 5;
 const WINDOW_MS = 10 * 60 * 1000;
 const hits = new Map<string, { count: number; resetAt: number }>();
@@ -77,34 +57,21 @@ export async function POST(request: Request) {
   }
 
   const data = parsed.data;
-
-  const inquiry: StoredInquiry = {
-    id: generateId(),
-    name: data.name.trim(),
-    email: data.email.trim(),
-    phone: data.phone?.trim() || null,
-    inquiryType: data.inquiryType,
-    company: data.company?.trim() || null,
-    moveInDate: data.moveInDate?.trim() || null,
-    building: data.building?.trim() || null,
-    buildingSlug: data.buildingSlug?.trim() || null,
-    message: data.message.trim(),
-    createdAt: new Date().toISOString(),
-  };
-
-  inquiries.set(inquiry.id, inquiry);
+  const name = data.name.trim();
+  const email = data.email.trim();
+  const building = data.building?.trim() || undefined;
 
   if (isEmailConfigured()) {
     const element = (
       <ContactNotificationEmail
-        name={inquiry.name}
-        email={inquiry.email}
-        phone={inquiry.phone ?? undefined}
+        name={name}
+        email={email}
+        phone={data.phone?.trim() || undefined}
         inquiryType={data.inquiryType}
-        building={inquiry.building ?? undefined}
-        company={inquiry.company ?? undefined}
-        moveInDate={inquiry.moveInDate ?? undefined}
-        message={inquiry.message}
+        building={building}
+        company={data.company?.trim() || undefined}
+        moveInDate={data.moveInDate?.trim() || undefined}
+        message={data.message.trim()}
       />
     );
     try {
@@ -113,21 +80,19 @@ export async function POST(request: Request) {
         render(element, { plainText: true }),
       ]);
       await sendContactNotification({
-        subject: `New ${inquiryTypeLabels[data.inquiryType]} inquiry from ${inquiry.name}${
-          inquiry.building ? ` — ${inquiry.building}` : ""
+        subject: `New ${inquiryTypeLabels[data.inquiryType]} inquiry from ${name}${
+          building ? ` — ${building}` : ""
         }`,
         html,
         text,
-        replyTo: inquiry.email,
+        replyTo: email,
       });
     } catch (error) {
       console.error("[contact] email notification failed:", error);
     }
   } else {
-    console.warn(
-      "[contact] email not configured — inquiry stored in memory without notification.",
-    );
+    console.warn("[contact] email not configured — inquiry not delivered.");
   }
 
-  return NextResponse.json({ ok: true, id: inquiry.id }, { status: 201 });
+  return NextResponse.json({ ok: true }, { status: 201 });
 }
