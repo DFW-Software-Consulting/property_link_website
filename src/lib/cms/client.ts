@@ -9,8 +9,13 @@
  * / `null` so the marketing site degrades gracefully when the CMS is offline.
  */
 
+// Hard guard: importing this module from a Client Component is a build error.
+// It reads server env and talks to the CMS server-to-server.
+import "server-only";
+
 import { env } from "@/lib/env";
 
+import { cmsLogger } from "./logger";
 import {
   cmsBuildingResponseSchema,
   cmsBuildingsResponseSchema,
@@ -63,7 +68,9 @@ export async function listCmsBuildings(): Promise<CmsBuildingSummary[]> {
     const json = await fetchCmsJson("/api/public/cms/buildings");
     return cmsBuildingsResponseSchema.parse(json).data;
   } catch (error) {
-    console.error("[cms] failed to list buildings", error);
+    cmsLogger.error("failed to list buildings", error, {
+      operation: "listBuildings",
+    });
     return [];
   }
 }
@@ -79,7 +86,35 @@ export async function getCmsBuilding(slug: string): Promise<CmsBuilding | null> 
     );
     return cmsBuildingResponseSchema.parse(json).data;
   } catch (error) {
-    console.error(`[cms] failed to load building "${slug}"`, error);
+    cmsLogger.error("failed to load building", error, {
+      operation: "getBuilding",
+      slug,
+    });
     return null;
+  }
+}
+
+/**
+ * Lightweight reachability probe for `/api/health`. Issues a HEAD against the
+ * buildings endpoint (Next auto-serves HEAD for GET routes, so this exercises
+ * the CMS without downloading a body) and never throws.
+ */
+export async function checkCmsHealth(): Promise<{
+  ok: boolean;
+  status?: number;
+  error?: string;
+}> {
+  try {
+    const res = await fetch(`${cmsApiBase()}/api/public/cms/buildings`, {
+      method: "HEAD",
+      signal: AbortSignal.timeout(CMS_REQUEST_TIMEOUT_MS),
+      cache: "no-store",
+    });
+    return { ok: res.ok, status: res.status };
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "unknown error",
+    };
   }
 }

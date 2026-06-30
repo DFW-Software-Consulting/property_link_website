@@ -62,6 +62,30 @@ same schema on the client and the server.
 | `npm run db:studio`   | Open Prisma Studio                     |
 | `npm run db:generate` | Regenerate the Prisma client           |
 
+## Long-Term Rentals CMS
+
+The `/long-term-rentals` pages (listing + per-building detail) are driven by the
+**Emmut public CMS API** — the property-management app is the source of truth for
+buildings, layouts, and photos. This site only reads from it.
+
+- **Origin**: `CMS_API_URL` (see `.env.example`). Unset/empty falls back to
+  production (`https://emmut.dfwsc.com`); the single fallback constant lives in
+  [`src/lib/cms/constants.ts`](src/lib/cms/constants.ts) and is shared by
+  `src/lib/env.ts` and `next.config.ts`.
+- **Endpoints consumed** (all public, no auth): `GET /api/public/cms/buildings`,
+  `GET /api/public/cms/buildings/{slug}`, and `GET /api/public/cms/images/{id}`
+  (`?variant=thumb` for the 800px webp). Image hosts are allow-listed in
+  `next.config.ts`.
+- **Client**: [`src/lib/cms/client.ts`](src/lib/cms/client.ts) (server-only).
+  Responses are Zod-validated (`src/lib/cms/schema.ts`); the helpers **never
+  throw** — on outage or a bad shape they log (structured, `scope: "cms"`) and
+  return `[]` / `null`, so pages render a graceful empty state instead of erroring.
+- **Caching**: ISR with a 60s revalidate window. For instant updates, the CMS can
+  POST `/api/revalidate` with the `x-revalidate-secret` header
+  (`CMS_REVALIDATE_SECRET`); when that secret is unset the route returns 503.
+- **Health**: `GET /api/health` probes CMS reachability — 200 when reachable,
+  503 when not — so a silent CMS outage is alertable.
+
 ## Project structure
 
 ```

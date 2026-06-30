@@ -1,18 +1,19 @@
 import type { NextConfig } from "next";
 
-// Origin of the Emmut public CMS API (kept in sync with src/lib/env.ts). Read
-// here too so `next/image` can be told which remote host serves CMS photos.
-const CMS_API_FALLBACK = "https://emmut.dfwsc.com";
+// Origin of the Emmut public CMS API — the same fallback `src/lib/env.ts` uses,
+// imported so the two can't drift. Read here so `next/image` can be told which
+// remote host serves CMS photos.
+import { CMS_API_FALLBACK_ORIGIN } from "./src/lib/cms/constants";
 
 // `||` (not `??`) so an empty string from a deploy platform also falls back, and
 // a guard so a malformed value can't crash `next build` / `next dev` at startup.
 function resolveCmsOrigin(): URL {
-  const raw = process.env.CMS_API_URL || CMS_API_FALLBACK;
+  const raw = process.env.CMS_API_URL || CMS_API_FALLBACK_ORIGIN;
   try {
     return new URL(raw);
   } catch {
-    console.warn(`[next.config] Invalid CMS_API_URL "${raw}" — falling back to ${CMS_API_FALLBACK}.`);
-    return new URL(CMS_API_FALLBACK);
+    console.warn(`[next.config] Invalid CMS_API_URL "${raw}" — falling back to ${CMS_API_FALLBACK_ORIGIN}.`);
+    return new URL(CMS_API_FALLBACK_ORIGIN);
   }
 }
 

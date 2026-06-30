@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { CMS_API_FALLBACK_ORIGIN } from "./cms/constants";
+
 /**
  * Server-side environment validation.
  * Do not import this from Client Components.
@@ -14,7 +16,7 @@ const envSchema = z.object({
   // e.g. CMS_API_URL=http://localhost:3000. Missing OR empty (a common deploy
   // platform footgun) both fall back to the default rather than failing parse.
   CMS_API_URL: z.preprocess(
-    (v) => (typeof v === "string" && v.trim() !== "" ? v : "https://emmut.dfwsc.com"),
+    (v) => (typeof v === "string" && v.trim() !== "" ? v : CMS_API_FALLBACK_ORIGIN),
     z.string().url(),
   ),
 
