@@ -9,8 +9,11 @@ import type { CmsBuildingSummary } from "@/lib/cms/types";
 /** A building tile in the long-term rentals grid, linking to its detail page. */
 export function CmsBuildingCard({
   building,
+  priority = false,
 }: {
   building: CmsBuildingSummary;
+  /** Eagerly load the image for above-the-fold cards (improves LCP). */
+  priority?: boolean;
 }) {
   return (
     <Link
@@ -26,7 +29,8 @@ export function CmsBuildingCard({
               `${building.name}${building.neighborhood ? ` in ${building.neighborhood}` : ""}`
             }
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            preload={priority}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 384px"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (

@@ -7,15 +7,26 @@ import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { CtaBand } from "@/components/marketing/cta-band";
 import { CmsBuildingCard } from "@/components/marketing/cms-building-card";
+import { JsonLd, buildingsItemListJsonLd } from "@/lib/seo/json-ld";
 import { listCmsBuildings } from "@/lib/cms/client";
 
 export const revalidate = 60;
 
+const PAGE_DESCRIPTION =
+  "Browse PropertyLink's long-term furnished rentals across Manhattan — every home in a building we own and manage, from Little Italy to the Upper East Side.";
+
 export const metadata: Metadata = {
   title: "Long-Term Rentals",
-  description:
-    "Browse PropertyLink's long-term furnished rentals across Manhattan — every home in a building we own and manage, from Little Italy to the Upper East Side.",
+  description: PAGE_DESCRIPTION,
   alternates: { canonical: "/long-term-rentals" },
+  openGraph: {
+    type: "website",
+    title: "Long-Term Rentals",
+    description: PAGE_DESCRIPTION,
+    url: "/long-term-rentals",
+    images: ["/images/hero.jpg"],
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default async function LongTermRentalsPage() {
@@ -23,6 +34,10 @@ export default async function LongTermRentalsPage() {
 
   return (
     <>
+      {buildings.length > 0 ? (
+        <JsonLd data={buildingsItemListJsonLd(buildings)} />
+      ) : null}
+
       <Section tone="muted" spacing="sm">
         <Container className="flex max-w-3xl flex-col gap-5 py-8">
           <SectionHeading
@@ -38,8 +53,12 @@ export default async function LongTermRentalsPage() {
         <Container className="flex flex-col gap-10">
           {buildings.length > 0 ? (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {buildings.map((building) => (
-                <CmsBuildingCard key={building.slug} building={building} />
+              {buildings.map((building, index) => (
+                <CmsBuildingCard
+                  key={building.slug}
+                  building={building}
+                  priority={index < 3}
+                />
               ))}
             </div>
           ) : (
