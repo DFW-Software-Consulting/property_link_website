@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Dialog } from "@base-ui/react/dialog";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -16,21 +16,67 @@ export type GalleryImage = {
   height: number | null;
 };
 
+export type GalleryLayout = "grid" | "carousel";
+
+/** Thumbnail button that opens the lightbox at `index`. */
+function GalleryThumb({
+  image,
+  index,
+  count,
+  onOpen,
+}: {
+  image: GalleryImage;
+  index: number;
+  count: number;
+  onOpen: (index: number) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(index)}
+      aria-label={`View photo ${index + 1} of ${count}${image.alt ? `: ${image.alt}` : ""}`}
+      className="group relative block aspect-[4/3] w-full overflow-hidden rounded-lg bg-muted ring-1 ring-foreground/10 transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+    >
+      <Image
+        src={image.thumbSrc}
+        alt=""
+        fill
+        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 288px"
+        className="object-cover transition-transform duration-300 group-hover:scale-105"
+        {...(image.blurDataUrl
+          ? { placeholder: "blur" as const, blurDataURL: image.blurDataUrl }
+          : {})}
+      />
+    </button>
+  );
+}
+
 /**
- * Building photo grid with an accessible lightbox. base-ui's Dialog provides the
- * focus trap, Escape-to-close, scroll lock, and aria-modal; we add left/right
- * arrow-key navigation and prev/next controls.
+ * Building photo gallery with an accessible lightbox. `layout` renders either a
+ * responsive grid or a horizontal auto-scrolling carousel. base-ui's Dialog
+ * provides the focus trap, Escape-to-close, scroll lock, and aria-modal; we add
+ * left/right arrow-key navigation and prev/next controls.
+ *
+ * The carousel auto-advances but pauses on hover/focus, when the lightbox is
+ * open, and entirely under `prefers-reduced-motion` — and is always manually
+ * scrollable — to satisfy the "pause auto-moving content" accessibility rule.
  */
 export function BuildingGallery({
   images,
   buildingName,
+  layout = "grid",
 }: {
   images: GalleryImage[];
   buildingName: string;
+  layout?: GalleryLayout;
 }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const isOpen = openIndex !== null;
   const count = images.length;
+
+  const scrollRef = useRef<HTMLUListElement>(null);
+  const [carouselPaused, setCarouselPaused] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
   const next = useCallback(
     () => setOpenIndex((i) => (i === null ? null : (i + 1) % count)),
@@ -53,35 +99,60 @@ export function BuildingGallery({
     return () => window.removeEventListener("keydown", onKey, true);
   }, [isOpen, next, prev]);
 
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    if (layout !== "carousel" || carouselPaused || reducedMotion || isOpen || count <= 1) {
+      return;
+    }
+    const el = scrollRef.current;
+    if (!el) return;
+    const id = window.setInterval(() => {
+      const nearEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 8;
+      el.scrollTo({
+        left: nearEnd ? 0 : el.scrollLeft + el.clientWidth * 0.8,
+        behavior: "smooth",
+      });
+    }, 3500);
+    return () => window.clearInterval(id);
+  }, [layout, carouselPaused, reducedMotion, isOpen, count]);
+
   if (count === 0) return null;
 
   const active = openIndex !== null ? images[openIndex] : null;
 
   return (
     <>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {images.map((image, i) => (
-          <li key={image.id}>
-            <button
-              type="button"
-              onClick={() => setOpenIndex(i)}
-              aria-label={`View photo ${i + 1} of ${count}${image.alt ? `: ${image.alt}` : ""}`}
-              className="group relative block aspect-[4/3] w-full overflow-hidden rounded-lg bg-muted ring-1 ring-foreground/10 transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-            >
-              <Image
-                src={image.thumbSrc}
-                alt=""
-                fill
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-                {...(image.blurDataUrl
-                  ? { placeholder: "blur" as const, blurDataURL: image.blurDataUrl }
-                  : {})}
-              />
-            </button>
-          </li>
-        ))}
-      </ul>
+      {layout === "carousel" ? (
+        <ul
+          ref={scrollRef}
+          onMouseEnter={() => setCarouselPaused(true)}
+          onMouseLeave={() => setCarouselPaused(false)}
+          onFocusCapture={() => setCarouselPaused(true)}
+          onBlurCapture={() => setCarouselPaused(false)}
+          className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-2"
+        >
+          {images.map((image, i) => (
+            <li key={image.id} className="w-64 shrink-0 snap-start sm:w-72">
+              <GalleryThumb image={image} index={i} count={count} onOpen={setOpenIndex} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {images.map((image, i) => (
+            <li key={image.id}>
+              <GalleryThumb image={image} index={i} count={count} onOpen={setOpenIndex} />
+            </li>
+          ))}
+        </ul>
+      )}
 
       <Dialog.Root
         open={isOpen}

@@ -42,6 +42,7 @@ describe("buildingJsonLd", () => {
       description: null,
       amenities: [],
       videoUrl: null,
+      galleryLayout: "grid",
       images: [],
       units: [
         {
@@ -75,6 +76,7 @@ describe("buildingJsonLd", () => {
         description: "Nice",
         amenities: [],
         videoUrl: null,
+        galleryLayout: "grid",
         images: [],
         units: [
           {

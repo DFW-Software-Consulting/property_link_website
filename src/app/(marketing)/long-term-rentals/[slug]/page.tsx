@@ -206,7 +206,11 @@ export default async function BuildingPage({
               title="Photo gallery"
               description="A closer look at the building and its spaces."
             />
-            <BuildingGallery images={galleryImages} buildingName={building.name} />
+            <BuildingGallery
+              images={galleryImages}
+              buildingName={building.name}
+              layout={building.galleryLayout}
+            />
           </Container>
         </Section>
       ) : null}
