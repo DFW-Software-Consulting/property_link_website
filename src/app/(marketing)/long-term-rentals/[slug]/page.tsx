@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { MapPin } from "lucide-react";
+import { Check, MapPin } from "lucide-react";
 import { Section } from "@/components/sections/section";
 import { SectionHeading } from "@/components/sections/section-heading";
 import { Container } from "@/components/layout/container";
@@ -9,6 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { CtaBand } from "@/components/marketing/cta-band";
 import { CmsUnitCard } from "@/components/marketing/cms-unit-card";
 import { BuildingLocation } from "@/components/marketing/building-location";
+import {
+  BuildingGallery,
+  type GalleryImage,
+} from "@/components/marketing/building-gallery";
 import { Breadcrumbs } from "@/components/marketing/breadcrumbs";
 import {
   JsonLd,
@@ -17,6 +21,7 @@ import {
   type Crumb,
 } from "@/lib/seo/json-ld";
 import { cmsImageUrl, getCmsBuilding, listCmsBuildings } from "@/lib/cms/client";
+import { buildingAmenities } from "@/lib/cms/amenities";
 
 export const revalidate = 60;
 
@@ -85,6 +90,30 @@ export default async function BuildingPage({
     building.name,
   )}&buildingSlug=${encodeURIComponent(building.slug)}`;
 
+  // Resolve image URLs server-side so the client gallery gets plain strings.
+  const galleryImages: GalleryImage[] = building.images.map((img) => ({
+    id: img.id,
+    src: cmsImageUrl(img.url),
+    thumbSrc: cmsImageUrl(img.thumbUrl),
+    alt: img.alt ?? building.name,
+    blurDataUrl: img.blurDataUrl,
+    width: img.width,
+    height: img.height,
+  }));
+  const amenities = buildingAmenities(building.units);
+
+  // Alternate section background bands regardless of which optional sections
+  // render (gallery/amenities only appear once the CMS provides the data).
+  const sections = [
+    ...(building.description ? ["description"] : []),
+    "layouts",
+    ...(galleryImages.length > 0 ? ["gallery"] : []),
+    ...(amenities.length > 0 ? ["amenities"] : []),
+    "location",
+  ];
+  const toneFor = (name: string): "default" | "muted" =>
+    sections.indexOf(name) % 2 === 0 ? "default" : "muted";
+
   return (
     <>
       <JsonLd data={buildingJsonLd(building)} />
@@ -99,6 +128,9 @@ export default async function BuildingPage({
             preload
             sizes="100vw"
             className="-z-10 object-cover"
+            {...(building.hero.blurDataUrl
+              ? { placeholder: "blur" as const, blurDataURL: building.hero.blurDataUrl }
+              : {})}
           />
         ) : null}
         <div
@@ -138,7 +170,7 @@ export default async function BuildingPage({
         </Section>
       ) : null}
 
-      <Section tone={building.description ? "muted" : "default"}>
+      <Section tone={toneFor("layouts")}>
         <Container className="flex flex-col gap-10">
           <SectionHeading
             eyebrow="Available layouts"
@@ -163,11 +195,47 @@ export default async function BuildingPage({
         </Container>
       </Section>
 
+      {galleryImages.length > 0 ? (
+        <Section tone={toneFor("gallery")}>
+          <Container className="flex flex-col gap-8">
+            <SectionHeading
+              eyebrow="Photos"
+              title="Building photos"
+              description="A closer look at the building and its spaces."
+            />
+            <BuildingGallery images={galleryImages} buildingName={building.name} />
+          </Container>
+        </Section>
+      ) : null}
+
+      {amenities.length > 0 ? (
+        <Section tone={toneFor("amenities")} spacing="sm">
+          <Container className="flex flex-col gap-6">
+            <SectionHeading
+              eyebrow="Amenities"
+              title="What's included"
+              description="Amenities available across this building's homes."
+            />
+            <ul className="flex flex-wrap gap-2">
+              {amenities.map((amenity) => (
+                <li
+                  key={amenity}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-1.5 text-sm ring-1 ring-foreground/10"
+                >
+                  <Check aria-hidden className="size-3.5 text-brand-strong" />
+                  {amenity}
+                </li>
+              ))}
+            </ul>
+          </Container>
+        </Section>
+      ) : null}
+
       <BuildingLocation
         name={building.name}
         address={building.address}
         neighborhood={building.neighborhood}
-        tone={building.description ? "default" : "muted"}
+        tone={toneFor("location")}
       />
 
       <CtaBand

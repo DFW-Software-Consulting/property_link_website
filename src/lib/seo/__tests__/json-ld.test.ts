@@ -40,8 +40,19 @@ describe("buildingJsonLd", () => {
       hero: null,
       unitCount: 1,
       description: null,
+      images: [],
       units: [
-        { slug: "u", title: "Studio", layoutLabel: null, beds: null, baths: null, hero: null },
+        {
+          slug: "u",
+          title: "Studio",
+          layoutLabel: null,
+          beds: null,
+          baths: null,
+          priceLabel: null,
+          priceMonthly: null,
+          amenities: [],
+          hero: null,
+        },
       ],
     });
     const json = JSON.stringify(ld);
@@ -60,8 +71,19 @@ describe("buildingJsonLd", () => {
         hero: null,
         unitCount: 1,
         description: "Nice",
+        images: [],
         units: [
-          { slug: "u", title: "1BR", layoutLabel: "1 Bedroom", beds: 1, baths: 1, hero: null },
+          {
+            slug: "u",
+            title: "1BR",
+            layoutLabel: "1 Bedroom",
+            beds: 1,
+            baths: 1,
+            priceLabel: null,
+            priceMonthly: null,
+            amenities: [],
+            hero: null,
+          },
         ],
       }),
     );

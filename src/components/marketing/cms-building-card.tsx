@@ -32,6 +32,9 @@ export function CmsBuildingCard({
             preload={priority}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 384px"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
+            {...(building.hero.blurDataUrl
+              ? { placeholder: "blur" as const, blurDataURL: building.hero.blurDataUrl }
+              : {})}
           />
         ) : (
           <div className="flex size-full items-center justify-center text-muted-foreground">
