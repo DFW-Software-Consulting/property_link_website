@@ -2,11 +2,9 @@
  * Amenity token → display-label helpers.
  *
  * The public CMS exposes amenities as stable tokens (e.g. "wifi",
- * "in-unit-laundry"). These turn them into human labels and dedupe the union
- * across a building's units. Pure — unit-testable, no Next/DOM deps.
+ * "in-unit-laundry"). These turn them into human labels and dedupe the union of
+ * a building's own amenities plus its units'. Pure — unit-testable, no DOM deps.
  */
-
-import type { CmsUnitSummary } from "./types";
 
 /** Tokens with nicer labels than a generic humanize would produce. */
 const AMENITY_LABELS: Record<string, string> = {
@@ -39,18 +37,24 @@ export function amenityLabel(token: string): string {
     .join(" ");
 }
 
+type AmenitySource = {
+  amenities: string[];
+  units: { amenities: string[] }[];
+};
+
 /**
- * Deduplicated, alphabetically-sorted amenity labels across a building's units.
- * Dedupe is by final label (so "wifi" and "wi-fi" collapse to one "Wi-Fi");
- * blank tokens are dropped.
+ * Deduplicated, alphabetically-sorted amenity labels for a building: its own
+ * building-level amenities plus the union across its units. Dedupe is by final
+ * label (so "wifi" and "wi-fi" collapse to one "Wi-Fi"); blank tokens dropped.
  */
-export function buildingAmenities(units: CmsUnitSummary[]): string[] {
+export function buildingAmenities(building: AmenitySource): string[] {
   const labels = new Set<string>();
-  for (const unit of units) {
-    for (const token of unit.amenities) {
-      if (!token.trim()) continue;
-      labels.add(amenityLabel(token));
+  const add = (tokens: string[]) => {
+    for (const token of tokens) {
+      if (token.trim()) labels.add(amenityLabel(token));
     }
-  }
+  };
+  add(building.amenities);
+  for (const unit of building.units) add(unit.amenities);
   return [...labels].sort((a, b) => a.localeCompare(b));
 }

@@ -35,20 +35,24 @@ describe("amenityLabel", () => {
 });
 
 describe("buildingAmenities", () => {
-  it("dedupes across units and sorts alphabetically", () => {
-    const result = buildingAmenities([
-      unit(["wifi", "gym"]),
-      unit(["gym", "dishwasher"]),
-    ]);
-    expect(result).toEqual(["Dishwasher", "Gym", "Wi-Fi"]);
+  it("unions building-level + unit amenities, deduped and sorted", () => {
+    const result = buildingAmenities({
+      amenities: ["doorman", "gym"],
+      units: [unit(["wifi", "gym"]), unit(["dishwasher"])],
+    });
+    expect(result).toEqual(["Dishwasher", "Doorman", "Gym", "Wi-Fi"]);
   });
 
-  it("collapses tokens that map to the same label", () => {
-    expect(buildingAmenities([unit(["wifi", "wi-fi"])])).toEqual(["Wi-Fi"]);
+  it("collapses tokens that map to the same label across building + units", () => {
+    expect(
+      buildingAmenities({ amenities: ["wifi"], units: [unit(["wi-fi"])] }),
+    ).toEqual(["Wi-Fi"]);
   });
 
   it("drops blank tokens and returns [] when there are none", () => {
-    expect(buildingAmenities([unit(["", "  "])])).toEqual([]);
-    expect(buildingAmenities([])).toEqual([]);
+    expect(
+      buildingAmenities({ amenities: ["", "  "], units: [unit(["  "])] }),
+    ).toEqual([]);
+    expect(buildingAmenities({ amenities: [], units: [] })).toEqual([]);
   });
 });
