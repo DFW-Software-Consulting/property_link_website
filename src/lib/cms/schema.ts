@@ -43,6 +43,9 @@ export const cmsBuildingSummarySchema = z.object({
 
 export const cmsBuildingSchema = cmsBuildingSummarySchema.extend({
   description: z.string().nullable(),
+  // Optional (default) so the site keeps working before the CMS exposes them.
+  amenities: z.array(z.string()).default([]),
+  videoUrl: z.string().nullable().default(null),
   units: z.array(cmsUnitSummarySchema),
   // The building's own gallery photos. Optional (default []) so responses that
   // predate the field still parse.

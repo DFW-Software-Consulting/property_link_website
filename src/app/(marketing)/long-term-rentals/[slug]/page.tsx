@@ -22,6 +22,7 @@ import {
 } from "@/lib/seo/json-ld";
 import { cmsImageUrl, getCmsBuilding, listCmsBuildings } from "@/lib/cms/client";
 import { buildingAmenities } from "@/lib/cms/amenities";
+import { getYouTubeEmbedUrl } from "@/lib/youtube";
 
 export const revalidate = 60;
 
@@ -100,14 +101,16 @@ export default async function BuildingPage({
     width: img.width,
     height: img.height,
   }));
-  const amenities = buildingAmenities(building.units);
+  const amenities = buildingAmenities(building);
+  const videoEmbedUrl = getYouTubeEmbedUrl(building.videoUrl);
 
   // Alternate section background bands regardless of which optional sections
-  // render (gallery/amenities only appear once the CMS provides the data).
+  // render (gallery/video/amenities only appear once the CMS provides the data).
   const sections = [
     ...(building.description ? ["description"] : []),
     "layouts",
     ...(galleryImages.length > 0 ? ["gallery"] : []),
+    ...(videoEmbedUrl ? ["video"] : []),
     ...(amenities.length > 0 ? ["amenities"] : []),
     "location",
   ];
@@ -200,10 +203,32 @@ export default async function BuildingPage({
           <Container className="flex flex-col gap-8">
             <SectionHeading
               eyebrow="Photos"
-              title="Building photos"
+              title="Photo gallery"
               description="A closer look at the building and its spaces."
             />
             <BuildingGallery images={galleryImages} buildingName={building.name} />
+          </Container>
+        </Section>
+      ) : null}
+
+      {videoEmbedUrl ? (
+        <Section tone={toneFor("video")}>
+          <Container className="flex flex-col gap-6">
+            <SectionHeading
+              eyebrow="Video"
+              title="Take a video tour"
+              description="See the building and its spaces on video."
+            />
+            <div className="mx-auto aspect-video w-full max-w-3xl overflow-hidden rounded-xl ring-1 ring-foreground/10">
+              <iframe
+                src={videoEmbedUrl}
+                title={`${building.name} video tour`}
+                className="h-full w-full"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
           </Container>
         </Section>
       ) : null}
