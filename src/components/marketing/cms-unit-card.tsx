@@ -18,6 +18,9 @@ export function CmsUnitCard({ unit }: { unit: CmsUnitSummary }) {
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover"
+            {...(unit.hero.blurDataUrl
+              ? { placeholder: "blur" as const, blurDataURL: unit.hero.blurDataUrl }
+              : {})}
           />
         ) : (
           <div className="flex size-full items-center justify-center text-muted-foreground">

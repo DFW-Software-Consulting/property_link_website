@@ -14,6 +14,9 @@ export const cmsImageSchema = z.object({
   alt: z.string().nullable(),
   width: z.number().nullable(),
   height: z.number().nullable(),
+  // Tiny LQIP preview (data URL). Optional so responses from a CMS that predates
+  // the field still parse; defaults to null (no blur-up).
+  blurDataUrl: z.string().nullable().default(null),
 });
 
 export const cmsUnitSummarySchema = z.object({
@@ -22,6 +25,10 @@ export const cmsUnitSummarySchema = z.object({
   layoutLabel: z.string().nullable(),
   beds: z.number().nullable(),
   baths: z.number().nullable(),
+  // Optional (default) so the site keeps working before the CMS exposes them.
+  priceLabel: z.string().nullable().default(null),
+  priceMonthly: z.number().nullable().default(null),
+  amenities: z.array(z.string()).default([]),
   hero: cmsImageSchema.nullable(),
 });
 
@@ -37,6 +44,9 @@ export const cmsBuildingSummarySchema = z.object({
 export const cmsBuildingSchema = cmsBuildingSummarySchema.extend({
   description: z.string().nullable(),
   units: z.array(cmsUnitSummarySchema),
+  // The building's own gallery photos. Optional (default []) so responses that
+  // predate the field still parse.
+  images: z.array(cmsImageSchema).default([]),
 });
 
 /** Envelope wrappers — the API returns `{ data: ... }`. */
