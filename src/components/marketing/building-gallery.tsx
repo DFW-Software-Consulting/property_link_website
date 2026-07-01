@@ -47,8 +47,10 @@ export function BuildingGallery({
       if (e.key === "ArrowRight") next();
       else if (e.key === "ArrowLeft") prev();
     }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    // Capture phase: base-ui's Dialog stops arrow-key propagation in the bubble
+    // phase, so a normal (bubble) window listener never sees ArrowLeft/Right.
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
   }, [isOpen, next, prev]);
 
   if (count === 0) return null;
@@ -68,7 +70,7 @@ export function BuildingGallery({
             >
               <Image
                 src={image.thumbSrc}
-                alt={image.alt}
+                alt=""
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -92,23 +94,27 @@ export function BuildingGallery({
           <Dialog.Popup className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 focus:outline-none">
             <Dialog.Title className="sr-only">{buildingName} photos</Dialog.Title>
 
+            {/* Always-mounted live region so screen readers reliably announce the
+                photo change as the visitor pages through the gallery. */}
+            <div aria-live="polite" className="sr-only">
+              {active ? `Photo ${(openIndex ?? 0) + 1} of ${count}${active.alt ? `, ${active.alt}` : ""}` : ""}
+            </div>
+
             {active ? (
               <figure className="flex max-h-full max-w-5xl flex-col items-center">
                 <Image
+                  key={active.id}
                   src={active.src}
                   alt={active.alt}
                   width={active.width ?? 1200}
                   height={active.height ?? 800}
-                  sizes="100vw"
-                  className="max-h-[80vh] w-auto rounded-lg object-contain"
+                  sizes="(min-width: 1024px) 1024px, 100vw"
+                  className="max-h-[80vh] w-auto rounded-lg"
                   {...(active.blurDataUrl
                     ? { placeholder: "blur" as const, blurDataURL: active.blurDataUrl }
                     : {})}
                 />
-                <figcaption
-                  className="mt-3 text-center text-sm text-white/80"
-                  aria-live="polite"
-                >
+                <figcaption className="mt-3 text-center text-sm text-white/80">
                   {(openIndex ?? 0) + 1} / {count}
                   {active.alt ? ` — ${active.alt}` : ""}
                 </figcaption>
