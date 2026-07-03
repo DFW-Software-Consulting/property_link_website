@@ -52,7 +52,8 @@ export const navItems: NavItem[] = [
   { label: "About", href: "/about" },
   { label: "Services", href: "/services" },
   { label: "Long-Term Rentals", href: "/long-term-rentals" },
-  { label: "Residents", href: "/residents/maintenance" },
+  { label: "Short-Term Stays", href: "/short-term-stays" },
+  { label: "Work Order", href: "/residents/maintenance" },
   { label: "Contact", href: "/contact" },
 ];
 
