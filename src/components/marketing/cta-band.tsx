@@ -35,7 +35,7 @@ export function CtaBand({ title, description, ctaHref = "/contact" }: CtaBandPro
             render={<a href={siteConfig.phone.href} />}
             nativeButton={false}
             size="xl"
-            className="border border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
+            className="whitespace-nowrap border border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
           >
             <Phone aria-hidden />
             {siteConfig.phone.display}

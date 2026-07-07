@@ -44,7 +44,7 @@ export async function generateMetadata({
   const description =
     building.description ??
     `Long-term furnished rentals at ${building.name}${where} — a building PropertyLink owns and manages.`;
-  const path = `/long-term-rentals/${building.slug}`;
+  const path = `/residences/${building.slug}`;
   const ogImages = building.hero
     ? [
         {
@@ -83,8 +83,8 @@ export default async function BuildingPage({
 
   const crumbs: Crumb[] = [
     { name: "Home", path: "/" },
-    { name: "Long-Term Rentals", path: "/long-term-rentals" },
-    { name: building.name, path: `/long-term-rentals/${building.slug}` },
+    { name: "Residences", path: "/residences" },
+    { name: building.name, path: `/residences/${building.slug}` },
   ];
 
   const inquiryHref = `/contact?inquiryType=long_term&building=${encodeURIComponent(

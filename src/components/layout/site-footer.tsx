@@ -76,7 +76,7 @@ export function SiteFooter() {
               <li>
                 <a
                   href={siteConfig.phone.href}
-                  className="flex items-center gap-2.5 transition-colors hover:text-foreground"
+                  className="flex items-center gap-2.5 whitespace-nowrap transition-colors hover:text-foreground"
                 >
                   <Phone className="size-4 shrink-0 text-brand-strong" aria-hidden />
                   {siteConfig.phone.display}

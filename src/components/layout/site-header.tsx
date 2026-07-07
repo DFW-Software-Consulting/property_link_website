@@ -29,17 +29,17 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur supports-backdrop-filter:bg-background/65">
-      <Container className="flex h-16 items-center justify-between gap-4">
+      <Container className="flex h-16 max-w-7xl items-center justify-between gap-4">
         <Logo />
 
-        <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
+        <nav aria-label="Primary" className="hidden items-center gap-1 lg:flex">
           {primaryNavItems.map((item) => (
             <Link
               key={item.label}
               href={item.href}
               aria-current={isActive(item.href) ? "page" : undefined}
               className={cn(
-                "rounded-md px-3 py-2 text-sm font-medium transition-colors hover:text-foreground",
+                "whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-colors hover:text-foreground",
                 isActive(item.href) ? "text-foreground" : "text-muted-foreground",
               )}
             >
@@ -48,10 +48,10 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-4 md:flex">
+        <div className="hidden items-center gap-4 lg:flex">
           <a
             href={siteConfig.phone.href}
-            className="flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-brand-strong"
+            className="flex items-center gap-1.5 whitespace-nowrap text-sm font-medium transition-colors hover:text-brand-strong"
           >
             <Phone className="size-4" aria-hidden />
             {siteConfig.phone.display}
@@ -61,6 +61,7 @@ export function SiteHeader() {
             nativeButton={false}
             variant="brand"
             size="xl"
+            className="whitespace-nowrap"
           >
             Check Availability
           </Button>
@@ -72,7 +73,7 @@ export function SiteHeader() {
               <Button
                 variant="outline"
                 size="icon"
-                className="md:hidden"
+                className="lg:hidden"
                 aria-label="Open menu"
               />
             }
@@ -108,7 +109,7 @@ export function SiteHeader() {
             <div className="mt-auto flex flex-col gap-3 border-t border-border p-4">
               <a
                 href={siteConfig.phone.href}
-                className="flex items-center gap-2 text-sm font-medium"
+                className="flex items-center gap-2 whitespace-nowrap text-sm font-medium"
               >
                 <Phone className="size-4" aria-hidden />
                 {siteConfig.phone.display}

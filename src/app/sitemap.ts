@@ -7,7 +7,7 @@ export const revalidate = 60;
 
 const STATIC_ROUTES: { path: string; priority: number }[] = [
   { path: "/", priority: 1 },
-  { path: "/long-term-rentals", priority: 0.9 },
+  { path: "/residences", priority: 0.9 },
   { path: "/short-term-stays", priority: 0.9 },
   { path: "/services", priority: 0.8 },
   { path: "/about", priority: 0.6 },
@@ -27,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // listCmsBuildings never throws — degrades to the static routes if the CMS is down.
   const buildings = await listCmsBuildings();
   const buildingEntries: MetadataRoute.Sitemap = buildings.map((building) => ({
-    url: `${base}/long-term-rentals/${building.slug}`,
+    url: `${base}/residences/${building.slug}`,
     changeFrequency: "weekly",
     priority: 0.8,
   }));

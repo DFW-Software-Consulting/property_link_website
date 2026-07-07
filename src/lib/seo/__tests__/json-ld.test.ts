@@ -14,7 +14,7 @@ describe("buildingsItemListJsonLd", () => {
     expect(ld["@type"]).toBe("ItemList");
     expect(ld.itemListElement).toHaveLength(2);
     expect(ld.itemListElement[1]?.position).toBe(2);
-    expect(ld.itemListElement[0]?.url).toContain("/long-term-rentals/a");
+    expect(ld.itemListElement[0]?.url).toContain("/residences/a");
   });
 });
 
@@ -22,7 +22,7 @@ describe("breadcrumbJsonLd", () => {
   it("builds a positioned BreadcrumbList", () => {
     const ld = breadcrumbJsonLd([
       { name: "Home", path: "/" },
-      { name: "Long-Term Rentals", path: "/long-term-rentals" },
+      { name: "Residences", path: "/residences" },
     ]);
     expect(ld["@type"]).toBe("BreadcrumbList");
     expect(ld.itemListElement[0]?.name).toBe("Home");
