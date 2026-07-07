@@ -19,17 +19,17 @@ import {
 export const revalidate = 60;
 
 const PAGE_DESCRIPTION =
-  "Browse PropertyLink's long-term furnished rentals across Manhattan — every home in a building we own and manage, from Little Italy to the Upper East Side.";
+  "Browse PropertyLink's furnished residences across Manhattan — every home in a building we own and manage, from Little Italy to the Upper East Side.";
 
 export const metadata: Metadata = {
-  title: "Long-Term Rentals",
+  title: "Residences",
   description: PAGE_DESCRIPTION,
-  alternates: { canonical: "/long-term-rentals" },
+  alternates: { canonical: "/residences" },
   openGraph: {
     type: "website",
-    title: "Long-Term Rentals",
+    title: "Residences",
     description: PAGE_DESCRIPTION,
-    url: "/long-term-rentals",
+    url: "/residences",
     images: ["/images/hero.jpg"],
   },
   twitter: { card: "summary_large_image" },
@@ -71,8 +71,8 @@ export default async function LongTermRentalsPage({
         <Container className="flex max-w-3xl flex-col gap-5 py-8">
           <SectionHeading
             as="h1"
-            eyebrow="Long-term rentals"
-            title="Find your long-term home in Manhattan"
+            eyebrow="Residences"
+            title="Find your home in Manhattan"
             description="Each building below is one we own and manage end-to-end. Explore a property to see its available layouts, then reach out and we'll match you to the right home."
           />
         </Container>
@@ -115,7 +115,7 @@ export default async function LongTermRentalsPage({
                   <p className="text-sm text-muted-foreground">
                     Try a different neighborhood or search term — or{" "}
                     <Link
-                      href="/long-term-rentals"
+                      href="/residences"
                       className="font-medium text-brand-strong underline-offset-4 hover:underline"
                     >
                       clear all filters
@@ -134,7 +134,7 @@ export default async function LongTermRentalsPage({
                 No listings available right now
               </h2>
               <p className="text-sm text-muted-foreground">
-                We don&apos;t have any long-term rentals to show at the moment.
+                We don&apos;t have any residences to show at the moment.
                 Reach out and we&apos;ll share what&apos;s available and match you
                 to the right home.
               </p>

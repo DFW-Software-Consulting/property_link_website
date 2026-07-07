@@ -51,8 +51,7 @@ export const navItems: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
   { label: "Services", href: "/services" },
-  { label: "Long-Term Rentals", href: "/long-term-rentals" },
-  { label: "Short-Term Stays", href: "/short-term-stays" },
+  { label: "Residences", href: "/residences" },
   { label: "Work Order", href: "/residents/maintenance" },
   { label: "Contact", href: "/contact" },
 ];
@@ -75,8 +74,8 @@ export const footerGroups: FooterLinkGroup[] = [
   {
     title: "Services",
     links: [
-      { label: "Short-Term Furnished Stays", href: "/services#short-term" },
-      { label: "Long-Term Rentals", href: "/long-term-rentals" },
+      { label: "Short-Term Furnished Stays", href: "/short-term-stays" },
+      { label: "Residences", href: "/residences" },
       { label: "Corporate & Relocation", href: "/services#corporate" },
     ],
   },

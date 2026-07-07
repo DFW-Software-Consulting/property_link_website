@@ -25,7 +25,7 @@ export function buildingsItemListJsonLd(buildings: CmsBuildingSummary[]) {
     itemListElement: buildings.map((building, index) => ({
       "@type": "ListItem",
       position: index + 1,
-      url: absoluteUrl(`/long-term-rentals/${building.slug}`),
+      url: absoluteUrl(`/residences/${building.slug}`),
       name: building.name,
     })),
   };
@@ -56,7 +56,7 @@ export function buildingJsonLd(building: CmsBuilding) {
     "@context": "https://schema.org",
     "@type": "ApartmentComplex",
     name: building.name,
-    url: absoluteUrl(`/long-term-rentals/${building.slug}`),
+    url: absoluteUrl(`/residences/${building.slug}`),
     address: {
       "@type": "PostalAddress",
       streetAddress: building.address,

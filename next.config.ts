@@ -42,16 +42,27 @@ const nextConfig: NextConfig = {
     ],
   },
   async redirects() {
-    // `/properties` is an alias for the canonical `/long-term-rentals` route.
     return [
+      // `/properties` is an alias for the canonical `/residences` route.
       {
         source: "/properties",
-        destination: "/long-term-rentals",
+        destination: "/residences",
         permanent: true,
       },
       {
         source: "/properties/:slug",
-        destination: "/long-term-rentals/:slug",
+        destination: "/residences/:slug",
+        permanent: true,
+      },
+      // `/long-term-rentals` was renamed to `/residences`; keep old links working.
+      {
+        source: "/long-term-rentals",
+        destination: "/residences",
+        permanent: true,
+      },
+      {
+        source: "/long-term-rentals/:slug",
+        destination: "/residences/:slug",
         permanent: true,
       },
     ];

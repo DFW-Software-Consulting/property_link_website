@@ -13,15 +13,15 @@ export default function BuildingNotFound() {
         </h1>
         <p className="text-sm text-muted-foreground">
           This listing may have been removed or isn&apos;t available right now.
-          Browse our current long-term rentals instead.
+          Browse our current residences instead.
         </p>
         <Button
-          render={<Link href="/long-term-rentals" />}
+          render={<Link href="/residences" />}
           nativeButton={false}
           variant="brand"
           size="xl"
         >
-          Browse all rentals
+          Browse all residences
         </Button>
       </Container>
     </Section>

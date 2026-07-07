@@ -41,18 +41,18 @@ export async function POST(request: Request) {
       : undefined;
 
   // The listing + sitemap always change when published inventory changes.
-  const revalidated: string[] = ["/long-term-rentals", "/sitemap.xml"];
-  revalidatePath("/long-term-rentals");
+  const revalidated: string[] = ["/residences", "/sitemap.xml"];
+  revalidatePath("/residences");
   revalidatePath("/sitemap.xml");
 
   if (slug) {
-    const path = `/long-term-rentals/${slug}`;
+    const path = `/residences/${slug}`;
     revalidatePath(path);
     revalidated.push(path);
   } else {
     // No specific building — refresh every building detail page.
-    revalidatePath("/long-term-rentals/[slug]", "page");
-    revalidated.push("/long-term-rentals/[slug]");
+    revalidatePath("/residences/[slug]", "page");
+    revalidated.push("/residences/[slug]");
   }
 
   return NextResponse.json({ revalidated });
