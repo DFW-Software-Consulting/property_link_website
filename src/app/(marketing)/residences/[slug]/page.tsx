@@ -21,6 +21,7 @@ import {
   type Crumb,
 } from "@/lib/seo/json-ld";
 import { cmsImageUrl, getCmsBuilding, listCmsBuildings } from "@/lib/cms/client";
+import { descriptionToPlainText } from "@/lib/cms/description";
 import { buildingAmenities } from "@/lib/cms/amenities";
 import { getYouTubeEmbedUrl } from "@/lib/youtube";
 
@@ -41,8 +42,9 @@ export async function generateMetadata({
   if (!building) return { title: "Property not found" };
 
   const where = building.neighborhood ? `, ${building.neighborhood}` : "";
+  // `description` is now sanitized rich-text HTML; flatten it for meta/OG tags.
   const description =
-    building.description ??
+    descriptionToPlainText(building.description) ||
     `Long-term furnished rentals at ${building.name}${where} — a building PropertyLink owns and manages.`;
   const path = `/residences/${building.slug}`;
   const ogImages = building.hero
@@ -166,9 +168,11 @@ export default async function BuildingPage({
       {building.description ? (
         <Section spacing="sm">
           <Container className="max-w-3xl">
-            <p className="text-base text-pretty text-muted-foreground sm:text-lg">
-              {building.description}
-            </p>
+            {/* Sanitized rich-text HTML from the CMS (Emmut sanitizes on write). */}
+            <div
+              className="cms-prose text-base text-pretty text-muted-foreground sm:text-lg"
+              dangerouslySetInnerHTML={{ __html: building.description }}
+            />
           </Container>
         </Section>
       ) : null}

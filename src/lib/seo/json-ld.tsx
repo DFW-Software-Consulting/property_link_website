@@ -7,6 +7,7 @@
  */
 
 import { cmsImageUrl } from "@/lib/cms/client";
+import { descriptionToPlainText } from "@/lib/cms/description";
 import type { CmsBuilding, CmsBuildingSummary } from "@/lib/cms/types";
 import { siteConfig } from "@/lib/site-config";
 
@@ -67,7 +68,9 @@ export function buildingJsonLd(building: CmsBuilding) {
     },
   };
 
-  if (building.description) node.description = building.description;
+  // description is rich-text HTML; JSON-LD wants plain text.
+  const plainDescription = descriptionToPlainText(building.description);
+  if (plainDescription) node.description = plainDescription;
   if (building.hero) node.image = cmsImageUrl(building.hero.url);
 
   if (building.units.length > 0) {
