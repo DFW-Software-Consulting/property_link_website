@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Phone } from "lucide-react";
 import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
-import { siteConfig } from "@/lib/site-config";
+import { getSiteContactInfo } from "@/lib/contact-info";
 
 type CtaBandProps = {
   title?: string;
@@ -11,7 +11,9 @@ type CtaBandProps = {
   ctaHref?: string;
 };
 
-export function CtaBand({ title, description, ctaHref = "/contact" }: CtaBandProps) {
+export async function CtaBand({ title, description, ctaHref = "/contact" }: CtaBandProps) {
+  const contact = await getSiteContactInfo();
+
   return (
     <section className="bg-primary text-primary-foreground">
       <Container className="flex flex-col items-center gap-6 py-16 text-center sm:py-20">
@@ -32,13 +34,13 @@ export function CtaBand({ title, description, ctaHref = "/contact" }: CtaBandPro
             Check Availability
           </Button>
           <Button
-            render={<a href={siteConfig.phone.href} />}
+            render={<a href={contact.phone.href} />}
             nativeButton={false}
             size="xl"
             className="whitespace-nowrap border border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
           >
             <Phone aria-hidden />
-            {siteConfig.phone.display}
+            {contact.phone.display}
           </Button>
         </div>
       </Container>

@@ -162,3 +162,40 @@
     }
   }
 }
+
+@layer components {
+  /* Rich-text descriptions from the CMS (sanitized HTML: paragraphs, headings,
+     lists, emphasis, links). Keeps building copy readable without pulling in a
+     typography plugin. */
+  .cms-prose > :first-child {
+    @apply mt-0;
+  }
+  .cms-prose p {
+    @apply mt-4;
+  }
+  .cms-prose h2 {
+    @apply mt-6 text-xl font-semibold text-foreground;
+  }
+  .cms-prose h3 {
+    @apply mt-5 text-lg font-semibold text-foreground;
+  }
+  .cms-prose ul {
+    @apply mt-4 list-disc pl-6;
+  }
+  .cms-prose ol {
+    @apply mt-4 list-decimal pl-6;
+  }
+  .cms-prose li {
+    @apply mt-1;
+  }
+  .cms-prose strong,
+  .cms-prose b {
+    @apply font-semibold text-foreground;
+  }
+  .cms-prose a {
+    @apply font-medium text-brand-strong underline underline-offset-2;
+  }
+  .cms-prose blockquote {
+    @apply mt-4 border-l-2 border-border pl-4 italic;
+  }
+}

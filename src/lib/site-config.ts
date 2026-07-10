@@ -16,6 +16,15 @@ export type FooterLinkGroup = {
   links: { label: string; href: string }[];
 };
 
+/**
+ * Resolved public contact details. Sourced from the CMS when available (see
+ * `getSiteContactInfo`), otherwise the static `siteConfig` values below.
+ */
+export type SiteContactInfo = {
+  phone: { display: string; href: string };
+  email: string;
+};
+
 export const siteConfig = {
   name: "PropertyLink Management NYC",
   shortName: "PropertyLink NYC",

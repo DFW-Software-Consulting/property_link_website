@@ -19,8 +19,9 @@ import { cmsLogger } from "./logger";
 import {
   cmsBuildingResponseSchema,
   cmsBuildingsResponseSchema,
+  cmsCompanyInfoResponseSchema,
 } from "./schema";
-import type { CmsBuilding, CmsBuildingSummary } from "./types";
+import type { CmsBuilding, CmsBuildingSummary, CmsCompanyInfo } from "./types";
 
 /** How long fetched CMS content is cached before Next revalidates (seconds). */
 const CMS_REVALIDATE_SECONDS = 60;
@@ -89,6 +90,23 @@ export async function getCmsBuilding(slug: string): Promise<CmsBuilding | null> 
     cmsLogger.error("failed to load building", error, {
       operation: "getBuilding",
       slug,
+    });
+    return null;
+  }
+}
+
+/**
+ * Public contact details (phone + email) managed in the CMS. Returns `null`
+ * when the CMS is unreachable or the shape is invalid so callers can fall back
+ * to the static `siteConfig` values instead of rendering nothing.
+ */
+export async function getCmsCompanyInfo(): Promise<CmsCompanyInfo | null> {
+  try {
+    const json = await fetchCmsJson("/api/public/cms/company-info");
+    return cmsCompanyInfoResponseSchema.parse(json).data;
+  } catch (error) {
+    cmsLogger.error("failed to load company info", error, {
+      operation: "getCompanyInfo",
     });
     return null;
   }

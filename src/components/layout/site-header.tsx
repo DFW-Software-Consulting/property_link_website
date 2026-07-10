@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sheet";
 import { Container } from "@/components/layout/container";
 import { Logo } from "@/components/layout/logo";
-import { primaryNavItems, siteConfig } from "@/lib/site-config";
+import { primaryNavItems, type SiteContactInfo } from "@/lib/site-config";
 
 function useIsActive() {
   const pathname = usePathname();
@@ -23,7 +23,7 @@ function useIsActive() {
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
-export function SiteHeader() {
+export function SiteHeader({ contact }: { contact: SiteContactInfo }) {
   const [open, setOpen] = useState(false);
   const isActive = useIsActive();
 
@@ -50,11 +50,11 @@ export function SiteHeader() {
 
         <div className="hidden items-center gap-4 lg:flex">
           <a
-            href={siteConfig.phone.href}
+            href={contact.phone.href}
             className="flex items-center gap-1.5 whitespace-nowrap text-sm font-medium transition-colors hover:text-brand-strong"
           >
             <Phone className="size-4" aria-hidden />
-            {siteConfig.phone.display}
+            {contact.phone.display}
           </a>
           <Button
             render={<Link href="/contact" />}
@@ -108,11 +108,11 @@ export function SiteHeader() {
             </nav>
             <div className="mt-auto flex flex-col gap-3 border-t border-border p-4">
               <a
-                href={siteConfig.phone.href}
+                href={contact.phone.href}
                 className="flex items-center gap-2 whitespace-nowrap text-sm font-medium"
               >
                 <Phone className="size-4" aria-hidden />
-                {siteConfig.phone.display}
+                {contact.phone.display}
               </a>
               <Button
                 render={<Link href="/contact" />}

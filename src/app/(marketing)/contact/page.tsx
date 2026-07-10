@@ -9,6 +9,7 @@ import {
   InstagramIcon,
 } from "@/components/icons/social-icons";
 import { INQUIRY_TYPES, type InquiryType } from "@/lib/schemas/contact";
+import { getSiteContactInfo } from "@/lib/contact-info";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
@@ -23,6 +24,7 @@ export default async function ContactPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const params = await searchParams;
+  const contact = await getSiteContactInfo();
   const building =
     typeof params.building === "string" ? params.building : undefined;
   const buildingSlug =
@@ -66,26 +68,26 @@ export default async function ContactPage({
                 </li>
                 <li>
                   <a
-                    href={siteConfig.phone.href}
+                    href={contact.phone.href}
                     className="flex items-center gap-3 transition-colors hover:text-brand-strong"
                   >
                     <Phone
                       className="size-5 shrink-0 text-brand-strong"
                       aria-hidden
                     />
-                    {siteConfig.phone.display}
+                    {contact.phone.display}
                   </a>
                 </li>
                 <li>
                   <a
-                    href={`mailto:${siteConfig.email}`}
+                    href={`mailto:${contact.email}`}
                     className="flex items-center gap-3 transition-colors hover:text-brand-strong"
                   >
                     <Mail
                       className="size-5 shrink-0 text-brand-strong"
                       aria-hidden
                     />
-                    {siteConfig.email}
+                    {contact.email}
                   </a>
                 </li>
                 <li className="flex items-start gap-3">
@@ -137,11 +139,11 @@ export default async function ContactPage({
                 through availability and next steps.
               </p>
               <a
-                href={siteConfig.phone.href}
+                href={contact.phone.href}
                 className="mt-4 inline-flex items-center gap-2 font-heading text-xl font-semibold"
               >
                 <Phone className="size-5" aria-hidden />
-                {siteConfig.phone.display}
+                {contact.phone.display}
               </a>
             </div>
           </aside>

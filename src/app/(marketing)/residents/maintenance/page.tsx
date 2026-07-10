@@ -4,7 +4,7 @@ import { Section } from "@/components/sections/section";
 import { SectionHeading } from "@/components/sections/section-heading";
 import { Container } from "@/components/layout/container";
 import { MaintenanceForm } from "@/components/maintenance/maintenance-form";
-import { siteConfig } from "@/lib/site-config";
+import { getSiteContactInfo } from "@/lib/contact-info";
 
 export const metadata: Metadata = {
   title: "Maintenance Request",
@@ -12,7 +12,9 @@ export const metadata: Metadata = {
     "Current PropertyLink NYC residents can submit a maintenance request online. Tell us what needs fixing, attach photos, and set your permission-to-enter preference — our team follows up promptly.",
 };
 
-export default function MaintenanceRequestPage() {
+export default async function MaintenanceRequestPage() {
+  const contact = await getSiteContactInfo();
+
   return (
     <Section>
       <Container className="flex flex-col gap-10">
@@ -64,11 +66,11 @@ export default function MaintenanceRequestPage() {
                 immediately instead of using this form.
               </p>
               <a
-                href={siteConfig.phone.href}
+                href={contact.phone.href}
                 className="mt-4 inline-flex items-center gap-2 font-heading text-xl font-semibold"
               >
                 <Phone className="size-5" aria-hidden />
-                {siteConfig.phone.display}
+                {contact.phone.display}
               </a>
             </div>
           </aside>

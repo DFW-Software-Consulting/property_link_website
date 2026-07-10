@@ -42,6 +42,8 @@ export const cmsBuildingSummarySchema = z.object({
 });
 
 export const cmsBuildingSchema = cmsBuildingSummarySchema.extend({
+  // Sanitized rich-text HTML (the CMS sanitizes on write). Render via
+  // `dangerouslySetInnerHTML`; use `descriptionToPlainText()` for meta/JSON-LD.
   description: z.string().nullable(),
   // Optional (default) so the site keeps working before the CMS exposes them.
   amenities: z.array(z.string()).default([]),
@@ -54,13 +56,25 @@ export const cmsBuildingSchema = cmsBuildingSummarySchema.extend({
   images: z.array(cmsImageSchema).default([]),
 });
 
+/**
+ * Public contact details managed in the CMS and rendered site-wide (header,
+ * footer, contact page). Both fields may be empty strings when unset — callers
+ * fall back to the static `siteConfig` values in that case.
+ */
+export const cmsCompanyInfoSchema = z.object({
+  email: z.string(),
+  phone: z.string(),
+});
+
 /** Envelope wrappers — the API returns `{ data: ... }`. */
 export const cmsBuildingsResponseSchema = z.object({
   data: z.array(cmsBuildingSummarySchema),
 });
 export const cmsBuildingResponseSchema = z.object({ data: cmsBuildingSchema });
+export const cmsCompanyInfoResponseSchema = z.object({ data: cmsCompanyInfoSchema });
 
 export type CmsImage = z.infer<typeof cmsImageSchema>;
 export type CmsUnitSummary = z.infer<typeof cmsUnitSummarySchema>;
 export type CmsBuildingSummary = z.infer<typeof cmsBuildingSummarySchema>;
 export type CmsBuilding = z.infer<typeof cmsBuildingSchema>;
+export type CmsCompanyInfo = z.infer<typeof cmsCompanyInfoSchema>;

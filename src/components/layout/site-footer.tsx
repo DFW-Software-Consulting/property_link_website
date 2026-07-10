@@ -6,9 +6,9 @@ import {
   FacebookIcon,
   InstagramIcon,
 } from "@/components/icons/social-icons";
-import { footerGroups, siteConfig } from "@/lib/site-config";
+import { footerGroups, siteConfig, type SiteContactInfo } from "@/lib/site-config";
 
-export function SiteFooter() {
+export function SiteFooter({ contact }: { contact: SiteContactInfo }) {
   const year = new Date().getFullYear();
 
   return (
@@ -75,20 +75,20 @@ export function SiteFooter() {
               </li>
               <li>
                 <a
-                  href={siteConfig.phone.href}
+                  href={contact.phone.href}
                   className="flex items-center gap-2.5 whitespace-nowrap transition-colors hover:text-foreground"
                 >
                   <Phone className="size-4 shrink-0 text-brand-strong" aria-hidden />
-                  {siteConfig.phone.display}
+                  {contact.phone.display}
                 </a>
               </li>
               <li>
                 <a
-                  href={`mailto:${siteConfig.email}`}
+                  href={`mailto:${contact.email}`}
                   className="flex items-center gap-2.5 transition-colors hover:text-foreground"
                 >
                   <Mail className="size-4 shrink-0 text-brand-strong" aria-hidden />
-                  {siteConfig.email}
+                  {contact.email}
                 </a>
               </li>
               <li className="flex items-start gap-2.5">
