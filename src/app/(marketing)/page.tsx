@@ -18,7 +18,7 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   description:
-    "PropertyLink NYC offers move-in-ready furnished apartments for short- and long-term stays across Manhattan. We own and manage every building we rent — from Little Italy to the Upper East Side.",
+    "PropertyLink NYC offers move-in-ready furnished apartments for 30-day stays and 12-month leases across Manhattan. We own and manage every building we rent — from Little Italy to the Upper East Side.",
 };
 
 const valueProps = [

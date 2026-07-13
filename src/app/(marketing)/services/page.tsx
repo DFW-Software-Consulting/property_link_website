@@ -17,7 +17,7 @@ import { services } from "@/lib/data/services";
 export const metadata: Metadata = {
   title: "Furnished Housing Services",
   description:
-    "Short-term furnished stays, long-term rentals, and corporate relocation housing across Manhattan — all in PropertyLink-owned buildings with Wi-Fi, utilities, linens, and full kitchens included.",
+    "Furnished stays of 30 days or more, 12-month leases, and corporate relocation housing across Manhattan — all in PropertyLink-owned buildings with Wi-Fi, utilities, linens, and full kitchens included.",
 };
 
 const steps = [

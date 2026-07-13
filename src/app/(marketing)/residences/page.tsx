@@ -19,7 +19,7 @@ import {
 export const revalidate = 60;
 
 const PAGE_DESCRIPTION =
-  "Browse PropertyLink's furnished residences across Manhattan — every home in a building we own and manage, from Little Italy to the Upper East Side.";
+  "Browse PropertyLink's furnished residences across Manhattan — 12-month leases in a building we own and manage, from Little Italy to the Upper East Side.";
 
 export const metadata: Metadata = {
   title: "Residences",
@@ -73,7 +73,7 @@ export default async function LongTermRentalsPage({
             as="h1"
             eyebrow="Residences"
             title="Find your home in Manhattan"
-            description="Each building below is one we own and manage end-to-end. Explore a property to see its available layouts, then reach out and we'll match you to the right home."
+            description="Each building below is one we own and manage end-to-end, with 12-month leases available. Explore a property to see its available layouts, then reach out and we'll match you to the right home."
           />
         </Container>
       </Section>
