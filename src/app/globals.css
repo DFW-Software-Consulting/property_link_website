@@ -52,36 +52,37 @@
 }
 
 :root {
-  /* Premium NYC real-estate palette: warm "paper" surfaces, deep navy ink,
-     brass/gold brand accent used sparingly. */
-  --background: oklch(0.98 0.006 85);
-  --foreground: oklch(0.23 0.03 260);
-  --card: oklch(0.995 0.004 85);
-  --card-foreground: oklch(0.23 0.03 260);
-  --popover: oklch(0.995 0.004 85);
-  --popover-foreground: oklch(0.23 0.03 260);
-  --primary: oklch(0.28 0.045 262);
-  --primary-foreground: oklch(0.98 0.006 85);
-  --secondary: oklch(0.955 0.008 85);
-  --secondary-foreground: oklch(0.28 0.045 262);
-  --muted: oklch(0.955 0.008 85);
-  --muted-foreground: oklch(0.5 0.02 265);
-  --accent: oklch(0.94 0.018 85);
-  --accent-foreground: oklch(0.28 0.045 262);
-  /* Brand brass: --brand for fills/decorative, --brand-strong for accessible
-     small text on light surfaces. */
-  --brand: oklch(0.72 0.115 78);
-  --brand-foreground: oklch(0.26 0.04 262);
-  --brand-strong: oklch(0.47 0.085 70);
+  /* "Corporate Trust" palette (client-approved): white pages, cool gray
+     surfaces/lines, deep blue-gray ink, PropertyLink teal as the single accent. */
+  --background: #ffffff;
+  --foreground: #16232a;
+  --card: #ffffff;
+  --card-foreground: #16232a;
+  --popover: #ffffff;
+  --popover-foreground: #16232a;
+  /* Dark teal: CTA band background and default solid controls. */
+  --primary: #163c46;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f7f8;
+  --secondary-foreground: #16232a;
+  --muted: #f4f7f8;
+  --muted-foreground: #55666d;
+  --accent: #e9f0f2;
+  --accent-foreground: #16232a;
+  /* Brand teal: --brand for fills/decorative, --brand-strong darkened just
+     enough to keep small text on white at WCAG AA (#0e8ca6 is 3.95:1). */
+  --brand: #0e8ca6;
+  --brand-foreground: #ffffff;
+  --brand-strong: #0d7d94;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.9 0.01 85);
-  --input: oklch(0.9 0.01 85);
-  --ring: oklch(0.28 0.045 262);
-  --chart-1: oklch(0.72 0.115 78);
-  --chart-2: oklch(0.45 0.05 262);
-  --chart-3: oklch(0.28 0.045 262);
-  --chart-4: oklch(0.6 0.08 75);
-  --chart-5: oklch(0.5 0.02 265);
+  --border: #dce3e5;
+  --input: #dce3e5;
+  --ring: #0e8ca6;
+  --chart-1: #0e8ca6;
+  --chart-2: #163c46;
+  --chart-3: #55666d;
+  --chart-4: #7fc2d1;
+  --chart-5: #16232a;
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -94,32 +95,32 @@
 }
 
 .dark {
-  --background: oklch(0.19 0.02 262);
-  --foreground: oklch(0.96 0.006 85);
-  --card: oklch(0.23 0.025 262);
-  --card-foreground: oklch(0.96 0.006 85);
-  --popover: oklch(0.23 0.025 262);
-  --popover-foreground: oklch(0.96 0.006 85);
-  --primary: oklch(0.88 0.04 85);
-  --primary-foreground: oklch(0.22 0.03 262);
-  --secondary: oklch(0.28 0.025 262);
-  --secondary-foreground: oklch(0.96 0.006 85);
-  --muted: oklch(0.28 0.025 262);
-  --muted-foreground: oklch(0.72 0.02 265);
-  --accent: oklch(0.32 0.03 262);
-  --accent-foreground: oklch(0.96 0.006 85);
-  --brand: oklch(0.78 0.12 80);
-  --brand-foreground: oklch(0.2 0.03 262);
-  --brand-strong: oklch(0.82 0.11 82);
+  --background: #0f191e;
+  --foreground: #eef4f6;
+  --card: #16232a;
+  --card-foreground: #eef4f6;
+  --popover: #16232a;
+  --popover-foreground: #eef4f6;
+  --primary: #eef4f6;
+  --primary-foreground: #16232a;
+  --secondary: #1c2b33;
+  --secondary-foreground: #eef4f6;
+  --muted: #1c2b33;
+  --muted-foreground: #9db1b9;
+  --accent: #22343d;
+  --accent-foreground: #eef4f6;
+  --brand: #2aa5bf;
+  --brand-foreground: #0f191e;
+  --brand-strong: #5cbdd2;
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.78 0.12 80);
-  --chart-1: oklch(0.78 0.12 80);
-  --chart-2: oklch(0.7 0.06 262);
-  --chart-3: oklch(0.6 0.06 262);
-  --chart-4: oklch(0.65 0.09 75);
-  --chart-5: oklch(0.72 0.02 265);
+  --ring: #2aa5bf;
+  --chart-1: #2aa5bf;
+  --chart-2: #5cbdd2;
+  --chart-3: #9db1b9;
+  --chart-4: #7fc2d1;
+  --chart-5: #eef4f6;
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
