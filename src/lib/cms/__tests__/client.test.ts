@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cmsImageUrl, getCmsBuilding, listCmsBuildings } from "../client";
+import {
+  cmsImageUrl,
+  getCmsBuilding,
+  getPublicMaintenanceUnitInventory,
+  listCmsBuildings,
+} from "../client";
 
 const buildingSummary = {
   slug: "138-bowery",
@@ -82,5 +87,29 @@ describe("getCmsBuilding", () => {
   it("returns null on a 404", async () => {
     mockFetch(async () => new Response("nope", { status: 404 }));
     expect(await getCmsBuilding("missing")).toBeNull();
+  });
+});
+
+describe("getPublicMaintenanceUnitInventory", () => {
+  it("returns the public inventory and caches it for five minutes", async () => {
+    mockFetch(async () =>
+      okJson({
+        data: { buildings: [{ name: "Maple Court", units: ["1A", "2B"] }] },
+      }),
+    );
+
+    await expect(getPublicMaintenanceUnitInventory()).resolves.toEqual({
+      buildings: [{ name: "Maple Court", units: ["1A", "2B"] }],
+    });
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/api/public/maintenance-units"),
+      expect.objectContaining({ next: { revalidate: 300 } }),
+    );
+  });
+
+  it("returns null when the inventory request fails", async () => {
+    mockFetch(async () => new Response("error", { status: 500 }));
+
+    await expect(getPublicMaintenanceUnitInventory()).resolves.toBeNull();
   });
 });
