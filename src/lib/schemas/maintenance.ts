@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { BUILDINGS } from "@/lib/data/buildings";
 
 /**
  * Shared maintenance-request validation. The text-field schema is the single
@@ -37,11 +36,7 @@ export const PET_OPTIONS = [
 export const maintenanceFormSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(80),
   lastName: z.string().trim().min(1, "Last name is required").max(80),
-  building: z
-    .string()
-    .trim()
-    .min(1, "Please select your building")
-    .refine((value) => BUILDINGS.includes(value), "Please select your building"),
+  building: z.string().trim().min(1, "Building is required"),
   apartment: z.string().trim().min(1, "Apartment number is required").max(20),
   phone: z
     .string()

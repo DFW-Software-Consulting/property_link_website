@@ -5,6 +5,7 @@ import { SectionHeading } from "@/components/sections/section-heading";
 import { Container } from "@/components/layout/container";
 import { MaintenanceForm } from "@/components/maintenance/maintenance-form";
 import { getSiteContactInfo } from "@/lib/contact-info";
+import { getPublicMaintenanceUnitInventory } from "@/lib/cms/client";
 
 export const metadata: Metadata = {
   title: "Maintenance Request",
@@ -13,7 +14,10 @@ export const metadata: Metadata = {
 };
 
 export default async function MaintenanceRequestPage() {
-  const contact = await getSiteContactInfo();
+  const [contact, unitInventory] = await Promise.all([
+    getSiteContactInfo(),
+    getPublicMaintenanceUnitInventory(),
+  ]);
 
   return (
     <Section>
@@ -26,7 +30,7 @@ export default async function MaintenanceRequestPage() {
         />
 
         <div className="grid gap-10 lg:grid-cols-[1.25fr_1fr]">
-          <MaintenanceForm />
+          <MaintenanceForm unitInventory={unitInventory} />
 
           <aside className="flex flex-col gap-6">
             <div className="flex flex-col gap-5 rounded-xl bg-secondary/50 p-6 ring-1 ring-foreground/10 sm:p-8">

@@ -66,15 +66,34 @@ export const cmsCompanyInfoSchema = z.object({
   phone: z.string(),
 });
 
+/** Active operational inventory used by the public maintenance form. */
+export const maintenanceUnitBuildingSchema = z.object({
+  name: z.string().min(1),
+  units: z.array(z.string().min(1)),
+});
+
+export const maintenanceUnitInventorySchema = z.object({
+  buildings: z.array(maintenanceUnitBuildingSchema),
+});
+
 /** Envelope wrappers — the API returns `{ data: ... }`. */
 export const cmsBuildingsResponseSchema = z.object({
   data: z.array(cmsBuildingSummarySchema),
 });
 export const cmsBuildingResponseSchema = z.object({ data: cmsBuildingSchema });
 export const cmsCompanyInfoResponseSchema = z.object({ data: cmsCompanyInfoSchema });
+export const maintenanceUnitInventoryResponseSchema = z.object({
+  data: maintenanceUnitInventorySchema,
+});
 
 export type CmsImage = z.infer<typeof cmsImageSchema>;
 export type CmsUnitSummary = z.infer<typeof cmsUnitSummarySchema>;
 export type CmsBuildingSummary = z.infer<typeof cmsBuildingSummarySchema>;
 export type CmsBuilding = z.infer<typeof cmsBuildingSchema>;
 export type CmsCompanyInfo = z.infer<typeof cmsCompanyInfoSchema>;
+export type MaintenanceUnitBuilding = z.infer<
+  typeof maintenanceUnitBuildingSchema
+>;
+export type MaintenanceUnitInventory = z.infer<
+  typeof maintenanceUnitInventorySchema
+>;

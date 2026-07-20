@@ -16,7 +16,7 @@ import {
   type MaintenanceFormInput,
   type PermissionValue,
 } from "@/lib/schemas/maintenance";
-import { BUILDINGS } from "@/lib/data/buildings";
+import type { MaintenanceUnitInventory } from "@/lib/cms/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -79,7 +79,13 @@ async function submitMaintenanceRequest(formData: FormData) {
   return res.json();
 }
 
-export function MaintenanceForm() {
+type MaintenanceFormProps = {
+  unitInventory?: MaintenanceUnitInventory | null;
+};
+
+export function MaintenanceForm({
+  unitInventory = null,
+}: MaintenanceFormProps) {
   const photosLabelId = useId();
   const permissionLegendId = useId();
   const petLegendId = useId();
@@ -95,6 +101,8 @@ export function MaintenanceForm() {
     handleSubmit,
     control,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<MaintenanceFormInput>({
     resolver: zodResolver(maintenanceFormSchema),
@@ -112,6 +120,13 @@ export function MaintenanceForm() {
       website: "",
     },
   });
+
+  const selectedBuilding = watch("building");
+  const hasUnitInventory = (unitInventory?.buildings.length ?? 0) > 0;
+  const units =
+    unitInventory?.buildings.find(
+      (building) => building.name === selectedBuilding,
+    )?.units ?? [];
 
   const handleVerify = useCallback((token: string) => {
     setCaptchaToken(token);
@@ -242,24 +257,47 @@ export function MaintenanceForm() {
           required
           error={errors.building?.message}
         >
-          <Controller
-            control={control}
-            name="building"
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger id="building" className="w-full">
-                  <SelectValue placeholder="Select your building" />
-                </SelectTrigger>
-                <SelectContent>
-                  {BUILDINGS.map((building) => (
-                    <SelectItem key={building} value={building}>
-                      {building}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
+          {hasUnitInventory ? (
+            <Controller
+              control={control}
+              name="building"
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    setValue("apartment", "", { shouldValidate: true });
+                  }}
+                >
+                  <SelectTrigger
+                    id="building"
+                    className="w-full"
+                    aria-invalid={errors.building ? true : undefined}
+                    aria-describedby={
+                      errors.building ? "building-error" : undefined
+                    }
+                  >
+                    <SelectValue placeholder="Select your building" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {unitInventory?.buildings.map((building) => (
+                      <SelectItem key={building.name} value={building.name}>
+                        {building.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          ) : (
+            <Input
+              id="building"
+              autoComplete="street-address"
+              aria-invalid={errors.building ? true : undefined}
+              aria-describedby={errors.building ? "building-error" : undefined}
+              {...register("building")}
+            />
+          )}
         </Field>
 
         <Field
@@ -268,13 +306,53 @@ export function MaintenanceForm() {
           required
           error={errors.apartment?.message}
         >
-          <Input
-            id="apartment"
-            autoComplete="address-line2"
-            aria-invalid={errors.apartment ? true : undefined}
-            aria-describedby={errors.apartment ? "apartment-error" : undefined}
-            {...register("apartment")}
-          />
+          {hasUnitInventory ? (
+            <Controller
+              control={control}
+              name="apartment"
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={!selectedBuilding}
+                >
+                  <SelectTrigger
+                    id="apartment"
+                    className="w-full"
+                    aria-invalid={errors.apartment ? true : undefined}
+                    aria-describedby={
+                      errors.apartment ? "apartment-error" : undefined
+                    }
+                  >
+                    <SelectValue
+                      placeholder={
+                        selectedBuilding
+                          ? "Select your apartment"
+                          : "Select a building first"
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {units.map((unit) => (
+                      <SelectItem key={unit} value={unit}>
+                        {unit}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          ) : (
+            <Input
+              id="apartment"
+              autoComplete="address-line2"
+              aria-invalid={errors.apartment ? true : undefined}
+              aria-describedby={
+                errors.apartment ? "apartment-error" : undefined
+              }
+              {...register("apartment")}
+            />
+          )}
         </Field>
 
         <Field id="phone" label="Phone" required error={errors.phone?.message}>
