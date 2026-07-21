@@ -30,9 +30,9 @@ export default async function MaintenanceRequestPage() {
         />
 
         <div className="grid gap-10 lg:grid-cols-[1.25fr_1fr]">
-          <MaintenanceForm unitInventory={unitInventory} />
-
-          <aside className="flex flex-col gap-6">
+          {/* DOM-first so mobile/tablet readers hit the 911 guidance before
+              the form; lg:order-last restores the desktop sidebar spot. */}
+          <aside className="flex flex-col gap-6 lg:order-last">
             <div className="flex flex-col gap-5 rounded-xl bg-secondary/50 p-6 ring-1 ring-foreground/10 sm:p-8">
               <h2 className="font-heading text-lg font-semibold">
                 What happens next
@@ -84,6 +84,8 @@ export default async function MaintenanceRequestPage() {
               </a>
             </div>
           </aside>
+
+          <MaintenanceForm unitInventory={unitInventory} />
         </div>
       </Container>
     </Section>
