@@ -22,12 +22,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/ui/combobox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { TurnstileWidget } from "@/components/maintenance/turnstile-widget";
 import { siteConfig } from "@/lib/site-config";
@@ -123,6 +124,8 @@ export function MaintenanceForm({
 
   const selectedBuilding = watch("building");
   const hasUnitInventory = (unitInventory?.buildings.length ?? 0) > 0;
+  const buildingNames =
+    unitInventory?.buildings.map((building) => building.name) ?? [];
   const units =
     unitInventory?.buildings.find(
       (building) => building.name === selectedBuilding,
@@ -262,31 +265,35 @@ export function MaintenanceForm({
               control={control}
               name="building"
               render={({ field }) => (
-                <Select
+                <Combobox
+                  items={buildingNames}
                   value={field.value}
                   onValueChange={(value) => {
-                    field.onChange(value);
+                    field.onChange(value ?? "");
                     setValue("apartment", "", { shouldValidate: true });
                   }}
+                  autoHighlight
                 >
-                  <SelectTrigger
+                  <ComboboxInput
                     id="building"
                     className="w-full"
+                    placeholder="Select your building"
                     aria-invalid={errors.building ? true : undefined}
                     aria-describedby={
                       errors.building ? "building-error" : undefined
                     }
-                  >
-                    <SelectValue placeholder="Select your building" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {unitInventory?.buildings.map((building) => (
-                      <SelectItem key={building.name} value={building.name}>
-                        {building.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  />
+                  <ComboboxContent>
+                    <ComboboxEmpty>No matching buildings.</ComboboxEmpty>
+                    <ComboboxList>
+                      {(building: string) => (
+                        <ComboboxItem key={building} value={building}>
+                          {building}
+                        </ComboboxItem>
+                      )}
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
               )}
             />
           ) : (
@@ -311,35 +318,37 @@ export function MaintenanceForm({
               control={control}
               name="apartment"
               render={({ field }) => (
-                <Select
+                <Combobox
+                  items={units}
                   value={field.value}
-                  onValueChange={field.onChange}
+                  onValueChange={(value) => field.onChange(value ?? "")}
                   disabled={!selectedBuilding}
+                  autoHighlight
                 >
-                  <SelectTrigger
+                  <ComboboxInput
                     id="apartment"
                     className="w-full"
+                    placeholder={
+                      selectedBuilding
+                        ? "Select your apartment"
+                        : "Select a building first"
+                    }
                     aria-invalid={errors.apartment ? true : undefined}
                     aria-describedby={
                       errors.apartment ? "apartment-error" : undefined
                     }
-                  >
-                    <SelectValue
-                      placeholder={
-                        selectedBuilding
-                          ? "Select your apartment"
-                          : "Select a building first"
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {units.map((unit) => (
-                      <SelectItem key={unit} value={unit}>
-                        {unit}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  />
+                  <ComboboxContent>
+                    <ComboboxEmpty>No matching apartments.</ComboboxEmpty>
+                    <ComboboxList>
+                      {(unit: string) => (
+                        <ComboboxItem key={unit} value={unit}>
+                          {unit}
+                        </ComboboxItem>
+                      )}
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
               )}
             />
           ) : (
