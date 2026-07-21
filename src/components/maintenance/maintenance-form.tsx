@@ -66,6 +66,36 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+type ComboboxChangeEventDetails = {
+  reason: string;
+  cancel: () => void;
+};
+
+/**
+ * Base UI's Combobox clears the committed value when Escape is pressed while
+ * the popup is already closed — there's nothing open to dismiss. The native
+ * `<select>` this replaced left the value untouched in that case, so cancel
+ * Base UI's default handling and preserve the committed selection.
+ */
+export function cancelIfEscapeKey(
+  eventDetails: ComboboxChangeEventDetails,
+): boolean {
+  if (eventDetails.reason !== "escape-key") return false;
+  eventDetails.cancel();
+  return true;
+}
+
+/**
+ * Base UI keeps the previously committed value while the user free-types a
+ * query that no longer matches it — only the displayed text changes. A
+ * direct edit ("input-change") must invalidate that stale selection so a
+ * mismatched value can never be submitted; syncs that follow a real
+ * selection, a clear, or Escape use other reasons and are left alone.
+ */
+export function isDirectComboboxTextEdit(reason: string): boolean {
+  return reason === "input-change";
+}
+
 async function submitMaintenanceRequest(formData: FormData) {
   const res = await fetch("/api/maintenance", {
     method: "POST",
@@ -268,8 +298,15 @@ export function MaintenanceForm({
                 <Combobox
                   items={buildingNames}
                   value={field.value}
-                  onValueChange={(value) => {
+                  onValueChange={(value, eventDetails) => {
+                    if (cancelIfEscapeKey(eventDetails)) return;
                     field.onChange(value ?? "");
+                    setValue("apartment", "", { shouldValidate: true });
+                  }}
+                  onInputValueChange={(_value, eventDetails) => {
+                    if (cancelIfEscapeKey(eventDetails)) return;
+                    if (!isDirectComboboxTextEdit(eventDetails.reason)) return;
+                    field.onChange("");
                     setValue("apartment", "", { shouldValidate: true });
                   }}
                   autoHighlight
@@ -278,6 +315,7 @@ export function MaintenanceForm({
                     id="building"
                     className="w-full"
                     placeholder="Select your building"
+                    triggerLabel="Show building options"
                     aria-invalid={errors.building ? true : undefined}
                     aria-describedby={
                       errors.building ? "building-error" : undefined
@@ -321,7 +359,15 @@ export function MaintenanceForm({
                 <Combobox
                   items={units}
                   value={field.value}
-                  onValueChange={(value) => field.onChange(value ?? "")}
+                  onValueChange={(value, eventDetails) => {
+                    if (cancelIfEscapeKey(eventDetails)) return;
+                    field.onChange(value ?? "");
+                  }}
+                  onInputValueChange={(_value, eventDetails) => {
+                    if (cancelIfEscapeKey(eventDetails)) return;
+                    if (!isDirectComboboxTextEdit(eventDetails.reason)) return;
+                    field.onChange("");
+                  }}
                   disabled={!selectedBuilding}
                   autoHighlight
                 >
@@ -333,6 +379,7 @@ export function MaintenanceForm({
                         ? "Select your apartment"
                         : "Select a building first"
                     }
+                    triggerLabel="Show apartment options"
                     aria-invalid={errors.apartment ? true : undefined}
                     aria-describedby={
                       errors.apartment ? "apartment-error" : undefined
