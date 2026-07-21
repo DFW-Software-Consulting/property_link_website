@@ -44,8 +44,8 @@ export default async function MaintenanceRequestPage() {
                     aria-hidden
                   />
                   <span>
-                    Your request is logged and routed to the maintenance team for
-                    your building.
+                    Your request is logged and routed to the maintenance team
+                    for your building.
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -54,7 +54,7 @@ export default async function MaintenanceRequestPage() {
                     aria-hidden
                   />
                   <span>
-                    We aim to acknowledge non-emergency requests within one
+                    We aim to acknowledge non-urgent requests within one
                     business day.
                   </span>
                 </li>
@@ -63,11 +63,17 @@ export default async function MaintenanceRequestPage() {
 
             <div className="rounded-xl bg-primary p-6 text-primary-foreground sm:p-8">
               <h2 className="font-heading text-lg font-semibold">
-                Emergency?
+                Urgent issue?
               </h2>
               <p className="mt-2 text-sm text-primary-foreground/80">
-                For floods, fire, gas, or anything that threatens safety, call us
-                immediately instead of using this form.
+                If there&apos;s a fire, gas leak, smoke, or carbon monoxide
+                alarm,{" "}
+                <strong className="font-semibold text-primary-foreground">
+                  call 911 first
+                </strong>
+                . For urgent building issues that aren&apos;t life-threatening —
+                no heat, a major leak, a lockout — call us right away instead of
+                using this form.
               </p>
               <a
                 href={contact.phone.href}
