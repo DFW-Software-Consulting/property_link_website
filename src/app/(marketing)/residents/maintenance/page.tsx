@@ -30,9 +30,9 @@ export default async function MaintenanceRequestPage() {
         />
 
         <div className="grid gap-10 lg:grid-cols-[1.25fr_1fr]">
-          <MaintenanceForm unitInventory={unitInventory} />
-
-          <aside className="flex flex-col gap-6">
+          {/* DOM-first so mobile/tablet readers hit the 911 guidance before
+              the form; lg:order-last restores the desktop sidebar spot. */}
+          <aside className="flex flex-col gap-6 lg:order-last">
             <div className="flex flex-col gap-5 rounded-xl bg-secondary/50 p-6 ring-1 ring-foreground/10 sm:p-8">
               <h2 className="font-heading text-lg font-semibold">
                 What happens next
@@ -44,8 +44,8 @@ export default async function MaintenanceRequestPage() {
                     aria-hidden
                   />
                   <span>
-                    Your request is logged and routed to the maintenance team for
-                    your building.
+                    Your request is logged and routed to the maintenance team
+                    for your building.
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -54,7 +54,7 @@ export default async function MaintenanceRequestPage() {
                     aria-hidden
                   />
                   <span>
-                    We aim to acknowledge non-emergency requests within one
+                    We aim to acknowledge non-urgent requests within one
                     business day.
                   </span>
                 </li>
@@ -63,11 +63,17 @@ export default async function MaintenanceRequestPage() {
 
             <div className="rounded-xl bg-primary p-6 text-primary-foreground sm:p-8">
               <h2 className="font-heading text-lg font-semibold">
-                Emergency?
+                Urgent issue?
               </h2>
               <p className="mt-2 text-sm text-primary-foreground/80">
-                For floods, fire, gas, or anything that threatens safety, call us
-                immediately instead of using this form.
+                If there&apos;s a fire, gas leak, smoke, or carbon monoxide
+                alarm,{" "}
+                <strong className="font-semibold text-primary-foreground">
+                  call 911 first
+                </strong>
+                . For urgent building issues that aren&apos;t life-threatening —
+                no heat, a major leak, a lockout — call us right away instead of
+                using this form.
               </p>
               <a
                 href={contact.phone.href}
@@ -78,6 +84,8 @@ export default async function MaintenanceRequestPage() {
               </a>
             </div>
           </aside>
+
+          <MaintenanceForm unitInventory={unitInventory} />
         </div>
       </Container>
     </Section>
