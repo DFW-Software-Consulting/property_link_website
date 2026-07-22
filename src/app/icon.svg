@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 -4 120 116">
+  <!-- PropertyLink Mgmt house mark (see src/components/layout/logo.tsx). -->
+  <path d="M -7.3 36 L -32 36 L -32 -8 L 0 -34 L 11.2 -24.9 L 11.2 -40 L 20.2 -40 L 20.2 -17.6 L 29.6 -9.9 M 32 3.7 L 32 36 L 5.7 36" transform="translate(52 50) rotate(-14) scale(0.98)" fill="none" stroke="#0e8ca6" stroke-width="7.3"/>
+  <path d="M -32 36 L -32 -8 L 0 -34 L 11.2 -24.9 L 11.2 -40 L 20.2 -40 L 20.2 -17.6 L 32 -8 L 32 36 Z" transform="translate(88 66) rotate(-4) scale(0.92)" fill="none" stroke="#16232a" stroke-width="7.8"/>
+</svg>

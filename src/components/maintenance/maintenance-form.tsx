@@ -16,18 +16,19 @@ import {
   type MaintenanceFormInput,
   type PermissionValue,
 } from "@/lib/schemas/maintenance";
-import { BUILDINGS } from "@/lib/data/buildings";
+import type { MaintenanceUnitInventory } from "@/lib/cms/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/ui/combobox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { TurnstileWidget } from "@/components/maintenance/turnstile-widget";
 import { siteConfig } from "@/lib/site-config";
@@ -65,6 +66,36 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+type ComboboxChangeEventDetails = {
+  reason: string;
+  cancel: () => void;
+};
+
+/**
+ * Base UI's Combobox clears the committed value when Escape is pressed while
+ * the popup is already closed — there's nothing open to dismiss. The native
+ * `<select>` this replaced left the value untouched in that case, so cancel
+ * Base UI's default handling and preserve the committed selection.
+ */
+export function cancelIfEscapeKey(
+  eventDetails: ComboboxChangeEventDetails,
+): boolean {
+  if (eventDetails.reason !== "escape-key") return false;
+  eventDetails.cancel();
+  return true;
+}
+
+/**
+ * Base UI keeps the previously committed value while the user free-types a
+ * query that no longer matches it — only the displayed text changes. A
+ * direct edit ("input-change") must invalidate that stale selection so a
+ * mismatched value can never be submitted; syncs that follow a real
+ * selection, a clear, or Escape use other reasons and are left alone.
+ */
+export function isDirectComboboxTextEdit(reason: string): boolean {
+  return reason === "input-change";
+}
+
 async function submitMaintenanceRequest(formData: FormData) {
   const res = await fetch("/api/maintenance", {
     method: "POST",
@@ -79,7 +110,13 @@ async function submitMaintenanceRequest(formData: FormData) {
   return res.json();
 }
 
-export function MaintenanceForm() {
+type MaintenanceFormProps = {
+  unitInventory?: MaintenanceUnitInventory | null;
+};
+
+export function MaintenanceForm({
+  unitInventory = null,
+}: MaintenanceFormProps) {
   const photosLabelId = useId();
   const permissionLegendId = useId();
   const petLegendId = useId();
@@ -95,6 +132,8 @@ export function MaintenanceForm() {
     handleSubmit,
     control,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<MaintenanceFormInput>({
     resolver: zodResolver(maintenanceFormSchema),
@@ -112,6 +151,15 @@ export function MaintenanceForm() {
       website: "",
     },
   });
+
+  const selectedBuilding = watch("building");
+  const hasUnitInventory = (unitInventory?.buildings.length ?? 0) > 0;
+  const buildingNames =
+    unitInventory?.buildings.map((building) => building.name) ?? [];
+  const units =
+    unitInventory?.buildings.find(
+      (building) => building.name === selectedBuilding,
+    )?.units ?? [];
 
   const handleVerify = useCallback((token: string) => {
     setCaptchaToken(token);
@@ -242,24 +290,59 @@ export function MaintenanceForm() {
           required
           error={errors.building?.message}
         >
-          <Controller
-            control={control}
-            name="building"
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger id="building" className="w-full">
-                  <SelectValue placeholder="Select your building" />
-                </SelectTrigger>
-                <SelectContent>
-                  {BUILDINGS.map((building) => (
-                    <SelectItem key={building} value={building}>
-                      {building}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
+          {hasUnitInventory ? (
+            <Controller
+              control={control}
+              name="building"
+              render={({ field }) => (
+                <Combobox
+                  items={buildingNames}
+                  value={field.value}
+                  onValueChange={(value, eventDetails) => {
+                    if (cancelIfEscapeKey(eventDetails)) return;
+                    field.onChange(value ?? "");
+                    setValue("apartment", "", { shouldValidate: true });
+                  }}
+                  onInputValueChange={(_value, eventDetails) => {
+                    if (cancelIfEscapeKey(eventDetails)) return;
+                    if (!isDirectComboboxTextEdit(eventDetails.reason)) return;
+                    field.onChange("");
+                    setValue("apartment", "", { shouldValidate: true });
+                  }}
+                  autoHighlight
+                >
+                  <ComboboxInput
+                    id="building"
+                    className="w-full"
+                    placeholder="Select your building"
+                    triggerLabel="Show building options"
+                    aria-invalid={errors.building ? true : undefined}
+                    aria-describedby={
+                      errors.building ? "building-error" : undefined
+                    }
+                  />
+                  <ComboboxContent>
+                    <ComboboxEmpty>No matching buildings.</ComboboxEmpty>
+                    <ComboboxList>
+                      {(building: string) => (
+                        <ComboboxItem key={building} value={building}>
+                          {building}
+                        </ComboboxItem>
+                      )}
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
+              )}
+            />
+          ) : (
+            <Input
+              id="building"
+              autoComplete="street-address"
+              aria-invalid={errors.building ? true : undefined}
+              aria-describedby={errors.building ? "building-error" : undefined}
+              {...register("building")}
+            />
+          )}
         </Field>
 
         <Field
@@ -268,13 +351,64 @@ export function MaintenanceForm() {
           required
           error={errors.apartment?.message}
         >
-          <Input
-            id="apartment"
-            autoComplete="address-line2"
-            aria-invalid={errors.apartment ? true : undefined}
-            aria-describedby={errors.apartment ? "apartment-error" : undefined}
-            {...register("apartment")}
-          />
+          {hasUnitInventory ? (
+            <Controller
+              control={control}
+              name="apartment"
+              render={({ field }) => (
+                <Combobox
+                  items={units}
+                  value={field.value}
+                  onValueChange={(value, eventDetails) => {
+                    if (cancelIfEscapeKey(eventDetails)) return;
+                    field.onChange(value ?? "");
+                  }}
+                  onInputValueChange={(_value, eventDetails) => {
+                    if (cancelIfEscapeKey(eventDetails)) return;
+                    if (!isDirectComboboxTextEdit(eventDetails.reason)) return;
+                    field.onChange("");
+                  }}
+                  disabled={!selectedBuilding}
+                  autoHighlight
+                >
+                  <ComboboxInput
+                    id="apartment"
+                    className="w-full"
+                    placeholder={
+                      selectedBuilding
+                        ? "Select your apartment"
+                        : "Select a building first"
+                    }
+                    triggerLabel="Show apartment options"
+                    aria-invalid={errors.apartment ? true : undefined}
+                    aria-describedby={
+                      errors.apartment ? "apartment-error" : undefined
+                    }
+                  />
+                  <ComboboxContent>
+                    <ComboboxEmpty>No matching apartments.</ComboboxEmpty>
+                    <ComboboxList>
+                      {(unit: string) => (
+                        <ComboboxItem key={unit} value={unit}>
+                          {unit}
+                        </ComboboxItem>
+                      )}
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
+              )}
+            />
+          ) : (
+            <Input
+              id="apartment"
+              autoComplete="address-line2"
+              aria-invalid={errors.apartment ? true : undefined}
+              aria-describedby={
+                errors.apartment ? "apartment-error" : undefined
+              }
+              {...register("apartment")}
+            />
+          )}
         </Field>
 
         <Field id="phone" label="Phone" required error={errors.phone?.message}>

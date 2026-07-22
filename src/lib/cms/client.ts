@@ -20,11 +20,18 @@ import {
   cmsBuildingResponseSchema,
   cmsBuildingsResponseSchema,
   cmsCompanyInfoResponseSchema,
+  maintenanceUnitInventoryResponseSchema,
 } from "./schema";
-import type { CmsBuilding, CmsBuildingSummary, CmsCompanyInfo } from "./types";
+import type {
+  CmsBuilding,
+  CmsBuildingSummary,
+  CmsCompanyInfo,
+  MaintenanceUnitInventory,
+} from "./types";
 
 /** How long fetched CMS content is cached before Next revalidates (seconds). */
 const CMS_REVALIDATE_SECONDS = 60;
+const MAINTENANCE_UNITS_REVALIDATE_SECONDS = 300;
 
 /**
  * Server-to-server request timeout (ms). Bounds the await so a hung CMS (a
@@ -47,11 +54,14 @@ export function cmsImageUrl(relativePath: string): string {
 }
 
 /** Fetch + check status; returns the raw JSON body (validated by the caller). */
-async function fetchCmsJson(path: string): Promise<unknown> {
+async function fetchCmsJson(
+  path: string,
+  revalidate = CMS_REVALIDATE_SECONDS,
+): Promise<unknown> {
   const res = await fetch(`${cmsApiBase()}${path}`, {
     headers: { Accept: "application/json" },
     signal: AbortSignal.timeout(CMS_REQUEST_TIMEOUT_MS),
-    next: { revalidate: CMS_REVALIDATE_SECONDS },
+    next: { revalidate },
   });
   if (!res.ok) {
     throw new Error(`CMS request failed (${res.status}) for ${path}`);
@@ -107,6 +117,25 @@ export async function getCmsCompanyInfo(): Promise<CmsCompanyInfo | null> {
   } catch (error) {
     cmsLogger.error("failed to load company info", error, {
       operation: "getCompanyInfo",
+    });
+    return null;
+  }
+}
+
+/**
+ * Active building/unit labels for the maintenance form. A null or empty list
+ * lets the form fall back to its free-text location fields when the app is down.
+ */
+export async function getPublicMaintenanceUnitInventory(): Promise<MaintenanceUnitInventory | null> {
+  try {
+    const json = await fetchCmsJson(
+      "/api/public/maintenance-units",
+      MAINTENANCE_UNITS_REVALIDATE_SECONDS,
+    );
+    return maintenanceUnitInventoryResponseSchema.parse(json).data;
+  } catch (error) {
+    cmsLogger.error("failed to load maintenance unit inventory", error, {
+      operation: "getPublicMaintenanceUnitInventory",
     });
     return null;
   }
