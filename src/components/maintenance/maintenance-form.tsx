@@ -5,7 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowRight, Upload, X } from "lucide-react";
+import { ArrowRight, CheckCircle2, Upload, X } from "lucide-react";
 import {
   ACCEPTED_IMAGE_ACCEPT,
   MAX_PHOTOS,
@@ -125,6 +125,7 @@ export function MaintenanceForm({
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState("");
   const [captchaError, setCaptchaError] = useState<string | null>(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -170,9 +171,7 @@ export function MaintenanceForm({
   const mutation = useMutation({
     mutationFn: submitMaintenanceRequest,
     onSuccess: () => {
-      toast.success(
-        "Request received — our maintenance team will follow up shortly.",
-      );
+      setIsSubmitted(true);
       reset();
       setPhotos([]);
       setPhotoError(null);
@@ -205,6 +204,10 @@ export function MaintenanceForm({
     setPhotoError(null);
   }
 
+  function handleSubmitAnother() {
+    setIsSubmitted(false);
+  }
+
   function onValid(values: MaintenanceFormInput) {
     if (TURNSTILE_SITE_KEY && !captchaToken) {
       setCaptchaError("Please complete the verification challenge.");
@@ -233,6 +236,26 @@ export function MaintenanceForm({
     }
 
     mutation.mutate(formData);
+  }
+
+  if (isSubmitted) {
+    return (
+      <div
+        role="status"
+        className="flex animate-in flex-col items-center gap-4 rounded-xl bg-card p-6 text-center ring-1 ring-foreground/10 fade-in sm:p-8"
+      >
+        <CheckCircle2 className="size-10 text-brand-strong" aria-hidden />
+        <div className="flex flex-col gap-1">
+          <p className="text-lg font-medium">Thank you.</p>
+          <p className="text-muted-foreground">
+            Your request was sent, and you will hear from us shortly.
+          </p>
+        </div>
+        <Button type="button" variant="outline" onClick={handleSubmitAnother}>
+          Submit another request
+        </Button>
+      </div>
+    );
   }
 
   return (
