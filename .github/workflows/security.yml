@@ -1,0 +1,56 @@
+name: Security
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Nightly 09:00 UTC (~04:00-05:00 America/New_York) — off the push/PR
+    # path so secret scanning and the audit gate never slow down a PR.
+    - cron: "0 9 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Secret scanning (gitleaks). This repo is public, so the official action's
+  # free tier applies — no GITLEAKS_LICENSE needed. (If this repo is ever made
+  # private under the DFW-Software-Consulting org, switch to the pinned
+  # `docker run ghcr.io/gitleaks/gitleaks` approach used in the emmut repo,
+  # which sidesteps the org license requirement.)
+  # ---------------------------------------------------------------------------
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ---------------------------------------------------------------------------
+  # Dependency vulnerabilities (npm audit). Complements Dependabot (which only
+  # opens version-bump PRs). Blocks on CRITICAL to start; tighten to `high`
+  # once the current advisory backlog is triaged (as of this workflow's
+  # addition: 9 high / 1 moderate / 1 low, 0 critical — mostly transitive
+  # postcss/sharp findings pulled in via next, plus a nodemailer advisory
+  # that would require a breaking major-version bump to clear).
+  # ---------------------------------------------------------------------------
+  deps:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: npm audit (gate)
+        run: npm audit --omit=dev --audit-level=critical
