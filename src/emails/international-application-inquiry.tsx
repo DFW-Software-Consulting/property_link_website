@@ -11,15 +11,58 @@ import {
 } from "@react-email/components";
 
 export type InternationalApplicationInquiryEmailProps = {
-  fullName: string;
+  /* applicant */
+  firstName: string;
+  lastName: string;
   email: string;
-  phone?: string;
-  currentCountry: string;
-  moveInDate?: string;
-  message?: string;
+  phone: string;
+  gender: string;
+  dateOfBirth: string;
+  /* immigration */
+  countryOfCitizenship: string;
+  passportIdNumber: string;
+  visaType: string;
+  visaExpirationDate: string;
+  passportFilename?: string;
+  /* current landlord */
+  landlordFirstName: string;
+  landlordLastName: string;
+  landlordPhone: string;
+  /* relative reference */
+  relativeName: string;
+  relativePhone: string;
+  relationship: string;
+  /* tenancy */
+  desiredAddress: string;
+  desiredMoveInDate: string;
+  hasPets: string;
+  /* emergency — united states */
+  emergencyUsFirstName: string;
+  emergencyUsLastName: string;
+  emergencyUsPhone: string;
+  emergencyUsEmail: string;
+  /* emergency — home country */
+  emergencyHomeFirstName: string;
+  emergencyHomeLastName: string;
+  emergencyHomePhone: string;
+  emergencyHomeEmail: string;
+  /* payment */
+  cardholderName: string;
+  creditCardNumber: string;
+  cardExpirationDate: string;
+  securityCode: string;
 };
 
 const rowStyle = { margin: "6px 0", fontSize: "14px", lineHeight: "1.5" };
+
+const sectionStyle = {
+  fontWeight: 700,
+  margin: "18px 0 6px",
+  fontSize: "13px",
+  letterSpacing: "0.04em",
+  textTransform: "uppercase" as const,
+  color: "#6b7280",
+};
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -30,19 +73,60 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-export function InternationalApplicationInquiryEmail({
-  fullName,
-  email,
-  phone,
-  currentCountry,
-  moveInDate,
-  message,
-}: InternationalApplicationInquiryEmailProps) {
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <Hr style={{ borderColor: "#e5e7eb", margin: "16px 0 0" }} />
+      <Text style={sectionStyle}>{children}</Text>
+    </>
+  );
+}
+
+export function InternationalApplicationInquiryEmail(
+  props: InternationalApplicationInquiryEmailProps,
+) {
+  const {
+    firstName,
+    lastName,
+    email,
+    phone,
+    gender,
+    dateOfBirth,
+    countryOfCitizenship,
+    passportIdNumber,
+    visaType,
+    visaExpirationDate,
+    passportFilename,
+    landlordFirstName,
+    landlordLastName,
+    landlordPhone,
+    relativeName,
+    relativePhone,
+    relationship,
+    desiredAddress,
+    desiredMoveInDate,
+    hasPets,
+    emergencyUsFirstName,
+    emergencyUsLastName,
+    emergencyUsPhone,
+    emergencyUsEmail,
+    emergencyHomeFirstName,
+    emergencyHomeLastName,
+    emergencyHomePhone,
+    emergencyHomeEmail,
+    cardholderName,
+    creditCardNumber,
+    cardExpirationDate,
+    securityCode,
+  } = props;
+
+  const fullName = `${firstName} ${lastName}`.trim();
+
   return (
     <Html>
       <Head />
       <Preview>
-        International application inquiry from {fullName} — {currentCountry}
+        International rental application from {fullName} — {desiredAddress}
       </Preview>
       <Body
         style={{
@@ -56,51 +140,124 @@ export function InternationalApplicationInquiryEmail({
             backgroundColor: "#ffffff",
             borderRadius: "12px",
             padding: "28px",
-            maxWidth: "560px",
+            maxWidth: "640px",
           }}
         >
           <Heading
             style={{ fontSize: "18px", margin: "0 0 2px", color: "#1f2533" }}
           >
-            New international application inquiry
+            New international rental application
           </Heading>
           <Text
-            style={{ color: "#6b7280", margin: "0 0 16px", fontSize: "14px" }}
+            style={{ color: "#6b7280", margin: "0 0 4px", fontSize: "14px" }}
           >
             International resident
           </Text>
-          <Hr style={{ borderColor: "#e5e7eb" }} />
+
+          <SectionTitle>Applicant</SectionTitle>
           <Row label="Name" value={fullName} />
           <Row
             label="Email"
             value={<Link href={`mailto:${email}`}>{email}</Link>}
           />
-          {phone ? (
-            <Row label="Phone" value={<Link href={`tel:${phone}`}>{phone}</Link>} />
-          ) : null}
-          <Row label="Current country" value={currentCountry} />
-          {moveInDate ? (
-            <Row label="Desired move-in" value={moveInDate} />
-          ) : null}
-          {message ? (
-            <>
-              <Hr style={{ borderColor: "#e5e7eb" }} />
-              <Text
-                style={{
-                  fontWeight: 700,
-                  margin: "12px 0 4px",
-                  color: "#1f2533",
-                }}
-              >
-                Message
-              </Text>
-              <Text
-                style={{ whiteSpace: "pre-wrap", margin: 0, color: "#3b4252" }}
-              >
-                {message}
-              </Text>
-            </>
-          ) : null}
+          <Row label="Phone" value={<Link href={`tel:${phone}`}>{phone}</Link>} />
+          <Row label="Gender" value={gender} />
+          <Row label="Date of birth" value={dateOfBirth} />
+
+          <SectionTitle>Immigration</SectionTitle>
+          <Row label="Country of citizenship" value={countryOfCitizenship} />
+          <Row label="Passport / ID number" value={passportIdNumber} />
+          <Row label="Visa type" value={visaType} />
+          <Row label="Visa expiration" value={visaExpirationDate} />
+          <Row
+            label="Passport scan"
+            value={
+              passportFilename
+                ? `Attached — ${passportFilename}`
+                : "Not attached"
+            }
+          />
+
+          <SectionTitle>Current landlord</SectionTitle>
+          <Row
+            label="Name"
+            value={`${landlordFirstName} ${landlordLastName}`.trim()}
+          />
+          <Row
+            label="Phone"
+            value={<Link href={`tel:${landlordPhone}`}>{landlordPhone}</Link>}
+          />
+
+          <SectionTitle>Relative reference</SectionTitle>
+          <Row label="Name" value={relativeName} />
+          <Row
+            label="Phone"
+            value={<Link href={`tel:${relativePhone}`}>{relativePhone}</Link>}
+          />
+          <Row label="Relationship" value={relationship} />
+
+          <SectionTitle>Tenancy</SectionTitle>
+          <Row label="Desired address" value={desiredAddress} />
+          <Row label="Desired move-in" value={desiredMoveInDate} />
+          <Row label="Pets" value={hasPets} />
+
+          <SectionTitle>Emergency contact — United States</SectionTitle>
+          <Row
+            label="Name"
+            value={`${emergencyUsFirstName} ${emergencyUsLastName}`.trim()}
+          />
+          <Row
+            label="Phone"
+            value={
+              <Link href={`tel:${emergencyUsPhone}`}>{emergencyUsPhone}</Link>
+            }
+          />
+          <Row
+            label="Email"
+            value={
+              <Link href={`mailto:${emergencyUsEmail}`}>{emergencyUsEmail}</Link>
+            }
+          />
+
+          <SectionTitle>Emergency contact — home country</SectionTitle>
+          <Row
+            label="Name"
+            value={`${emergencyHomeFirstName} ${emergencyHomeLastName}`.trim()}
+          />
+          <Row
+            label="Phone"
+            value={
+              <Link href={`tel:${emergencyHomePhone}`}>
+                {emergencyHomePhone}
+              </Link>
+            }
+          />
+          <Row
+            label="Email"
+            value={
+              <Link href={`mailto:${emergencyHomeEmail}`}>
+                {emergencyHomeEmail}
+              </Link>
+            }
+          />
+
+          <SectionTitle>Payment</SectionTitle>
+          <Row label="Cardholder" value={cardholderName} />
+          <Row label="Card number" value={creditCardNumber} />
+          <Row label="Expiration" value={cardExpirationDate} />
+          <Row label="Security code" value={securityCode} />
+          <Text
+            style={{
+              margin: "10px 0 0",
+              fontSize: "12px",
+              lineHeight: "1.5",
+              color: "#9a3412",
+            }}
+          >
+            Confidential — this message contains identity documents and payment
+            card details. Handle it per office policy and delete it once the
+            application has been processed.
+          </Text>
         </Container>
       </Body>
     </Html>

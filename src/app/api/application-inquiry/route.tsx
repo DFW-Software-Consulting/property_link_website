@@ -3,7 +3,11 @@ import { NextResponse } from "next/server";
 import { InternationalApplicationInquiryEmail } from "@/emails/international-application-inquiry";
 import { isEmailConfigured, sendContactNotification } from "@/lib/email/mailer";
 import { verifyCaptcha } from "@/lib/maintenance/captcha";
-import { applicationInquirySchema } from "@/lib/schemas/application-inquiry";
+import {
+  applicationInquirySchema,
+  GENDER_LABELS,
+  validatePassportFile,
+} from "@/lib/schemas/application-inquiry";
 
 // Nodemailer requires the Node.js runtime.
 export const runtime = "nodejs";
@@ -22,6 +26,13 @@ function isRateLimited(ip: string): boolean {
   }
   entry.count += 1;
   return entry.count > RATE_LIMIT;
+}
+
+/** Sanitize an uploaded filename to a safe basename. */
+function safeFilename(original: string): string {
+  const base = original.split(/[\\/]/).pop() || "passport";
+  const cleaned = base.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 100);
+  return cleaned.replace(/^[._]+/, "") || "passport";
 }
 
 export async function POST(request: Request) {
@@ -56,12 +67,37 @@ export async function POST(request: Request) {
   }
 
   const parsed = applicationInquirySchema.safeParse({
-    fullName: getField("fullName"),
+    firstName: getField("firstName"),
+    lastName: getField("lastName"),
     email: getField("email"),
     phone: getField("phone"),
-    currentCountry: getField("currentCountry"),
-    moveInDate: getField("moveInDate"),
-    message: getField("message"),
+    gender: getField("gender"),
+    dateOfBirth: getField("dateOfBirth"),
+    countryOfCitizenship: getField("countryOfCitizenship"),
+    passportIdNumber: getField("passportIdNumber"),
+    visaType: getField("visaType"),
+    visaExpirationDate: getField("visaExpirationDate"),
+    landlordFirstName: getField("landlordFirstName"),
+    landlordLastName: getField("landlordLastName"),
+    landlordPhone: getField("landlordPhone"),
+    relativeName: getField("relativeName"),
+    relativePhone: getField("relativePhone"),
+    relationship: getField("relationship"),
+    desiredAddress: getField("desiredAddress"),
+    desiredMoveInDate: getField("desiredMoveInDate"),
+    hasPets: getField("hasPets"),
+    emergencyUsFirstName: getField("emergencyUsFirstName"),
+    emergencyUsLastName: getField("emergencyUsLastName"),
+    emergencyUsPhone: getField("emergencyUsPhone"),
+    emergencyUsEmail: getField("emergencyUsEmail"),
+    emergencyHomeFirstName: getField("emergencyHomeFirstName"),
+    emergencyHomeLastName: getField("emergencyHomeLastName"),
+    emergencyHomePhone: getField("emergencyHomePhone"),
+    emergencyHomeEmail: getField("emergencyHomeEmail"),
+    cardholderName: getField("cardholderName"),
+    creditCardNumber: getField("creditCardNumber"),
+    cardExpirationDate: getField("cardExpirationDate"),
+    securityCode: getField("securityCode"),
     captchaToken: getField("captchaToken"),
     website: getField("website"),
   });
@@ -70,6 +106,17 @@ export async function POST(request: Request) {
       { error: "Validation failed", issues: parsed.error.issues },
       { status: 400 },
     );
+  }
+
+  // The passport scan is a File, so it is validated outside the zod contract.
+  const passportEntry = form.get("passport");
+  const passport =
+    passportEntry instanceof File && passportEntry.size > 0
+      ? passportEntry
+      : null;
+  const passportCheck = validatePassportFile(passport);
+  if (!passportCheck.ok) {
+    return NextResponse.json({ error: passportCheck.error }, { status: 400 });
   }
 
   const data = parsed.data;
@@ -91,39 +138,72 @@ export async function POST(request: Request) {
     );
   }
 
-  const fullName = data.fullName.trim();
-  const email = data.email.trim();
-  const currentCountry = data.currentCountry.trim();
-  const phone = data.phone?.trim() || undefined;
-  const moveInDate = data.moveInDate?.trim() || undefined;
-  const message = data.message?.trim() || undefined;
+  // `passport` is non-null here — validatePassportFile rejects a missing file.
+  const passportFile = passport as File;
+  const passportFilename = safeFilename(passportFile.name);
+
+  const fullName = `${data.firstName} ${data.lastName}`.trim();
 
   const element = (
     <InternationalApplicationInquiryEmail
-      fullName={fullName}
-      email={email}
-      phone={phone}
-      currentCountry={currentCountry}
-      moveInDate={moveInDate}
-      message={message}
+      firstName={data.firstName}
+      lastName={data.lastName}
+      email={data.email}
+      phone={data.phone}
+      gender={GENDER_LABELS[data.gender]}
+      dateOfBirth={data.dateOfBirth}
+      countryOfCitizenship={data.countryOfCitizenship}
+      passportIdNumber={data.passportIdNumber}
+      visaType={data.visaType}
+      visaExpirationDate={data.visaExpirationDate}
+      passportFilename={passportFilename}
+      landlordFirstName={data.landlordFirstName}
+      landlordLastName={data.landlordLastName}
+      landlordPhone={data.landlordPhone}
+      relativeName={data.relativeName}
+      relativePhone={data.relativePhone}
+      relationship={data.relationship}
+      desiredAddress={data.desiredAddress}
+      desiredMoveInDate={data.desiredMoveInDate}
+      hasPets={data.hasPets === "yes" ? "Yes" : "No"}
+      emergencyUsFirstName={data.emergencyUsFirstName}
+      emergencyUsLastName={data.emergencyUsLastName}
+      emergencyUsPhone={data.emergencyUsPhone}
+      emergencyUsEmail={data.emergencyUsEmail}
+      emergencyHomeFirstName={data.emergencyHomeFirstName}
+      emergencyHomeLastName={data.emergencyHomeLastName}
+      emergencyHomePhone={data.emergencyHomePhone}
+      emergencyHomeEmail={data.emergencyHomeEmail}
+      cardholderName={data.cardholderName}
+      creditCardNumber={data.creditCardNumber}
+      cardExpirationDate={data.cardExpirationDate}
+      securityCode={data.securityCode}
     />
   );
 
   try {
-    const [html, text] = await Promise.all([
+    const [html, text, content] = await Promise.all([
       render(element),
       render(element, { plainText: true }),
+      passportFile.arrayBuffer().then((buffer) => Buffer.from(buffer)),
     ]);
     await sendContactNotification({
-      subject: `[Application Inquiry — International] ${fullName}, ${currentCountry}`,
+      subject: `[Rental Application — International] ${fullName}, ${data.countryOfCitizenship}`,
       html,
       text,
-      replyTo: email,
+      replyTo: data.email,
+      attachments: [
+        {
+          filename: passportFilename,
+          content,
+          contentType: passportFile.type,
+        },
+      ],
     });
   } catch (error) {
     console.error("[application-inquiry] email notification failed:", error);
     return NextResponse.json(
-      { error: "We couldn't submit your inquiry. Please try again." },
+      { error: "We couldn't submit your application. Please try again." },
       { status: 502 },
     );
   }

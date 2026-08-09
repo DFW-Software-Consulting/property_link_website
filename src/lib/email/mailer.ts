@@ -40,11 +40,19 @@ export function isEmailConfigured(): boolean {
   return isSmtpConfigured() && Boolean(env.CONTACT_TO && env.CONTACT_FROM);
 }
 
+/** A file attached to an outgoing message, in nodemailer's shape. */
+export type EmailAttachment = {
+  filename: string;
+  content: Buffer;
+  contentType: string;
+};
+
 type SendParams = {
   subject: string;
   html: string;
   text?: string;
   replyTo?: string;
+  attachments?: EmailAttachment[];
 };
 
 export async function sendContactNotification(
@@ -63,6 +71,7 @@ export async function sendContactNotification(
     subject: params.subject,
     html: params.html,
     text: params.text,
+    attachments: params.attachments,
   });
 }
 
