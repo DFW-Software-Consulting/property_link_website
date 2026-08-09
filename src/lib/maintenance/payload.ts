@@ -6,7 +6,7 @@ import { sign } from "./signature";
  * identical code. Server-only (transitively imports `node:crypto`).
  */
 
-export const FORM_VERSION = 1 as const;
+const FORM_VERSION = 1 as const;
 
 export const PERMISSION_TO_ENTER = ["yes", "no", "coordinate"] as const;
 export type PermissionToEnter = (typeof PERMISSION_TO_ENTER)[number];

@@ -12,10 +12,6 @@ import { env } from "@/lib/env";
 const VERIFY_URL =
   "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
-export function isCaptchaConfigured(): boolean {
-  return Boolean(env.TURNSTILE_SECRET_KEY);
-}
-
 type CaptchaResult = { success: boolean; reason?: string };
 
 type TurnstileResponse = {

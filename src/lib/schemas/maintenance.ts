@@ -25,7 +25,7 @@ export const PERMISSION_OPTIONS = [
   },
 ] as const;
 
-export const PERMISSION_VALUES = ["yes", "no", "coordinate"] as const;
+const PERMISSION_VALUES = ["yes", "no", "coordinate"] as const;
 export type PermissionValue = (typeof PERMISSION_VALUES)[number];
 
 export const PET_OPTIONS = [
@@ -67,8 +67,8 @@ export type MaintenanceFormInput = z.infer<typeof maintenanceFormSchema>;
 /* ------------------------------- photos ---------------------------------- */
 
 export const MAX_PHOTOS = 10;
-export const MAX_PHOTO_BYTES = 5 * 1024 * 1024; // ~5 MB each
-export const ACCEPTED_IMAGE_TYPES = [
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024; // ~5 MB each
+const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/png",
   "image/gif",
