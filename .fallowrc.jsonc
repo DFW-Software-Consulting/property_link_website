@@ -1,0 +1,40 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+
+  // shadcn/Base UI primitives are a deliberately complete internal component
+  // library. Treating the tree as an entry point marks its exports as
+  // externally consumed (no false "unused export"/"unused file" noise) while
+  // KEEPING the files under analysis for cycles, unresolved imports and
+  // complexity. Do not switch this to ignorePatterns, which would drop them
+  // from analysis entirely.
+  "entry": ["src/components/ui/**"],
+
+  // React Email templates are rendered dynamically by the mailer; their
+  // default exports are a tooling convention, not dead code.
+  "dynamicallyLoaded": ["src/emails/**/*.tsx"],
+
+  // Consumed by the CSS build pipeline (postcss.config.mjs + globals.css),
+  // not via the module graph. Verified with `fallow --trace-dependency`.
+  "ignoreDependencies": ["tailwindcss"],
+
+  "rules": {
+    // Unreachable shipped files are real waste.
+    "unused-files": "error",
+    // Usually a redundant `export` keyword, not a deletion — review, don't block.
+    "unused-exports": "warn",
+    // Type-only surface is sometimes an intentional DTO facade.
+    "unused-types": "warn",
+    // A declared package nothing imports is safe, high-value cleanup.
+    // NB: rule keys are the canonical names, not the CLI filter-flag spellings
+    // (`unused-deps`/`circular-deps` etc. are silently ignored with a warning).
+    "unused-dependencies": "error",
+    // Missing declarations break clean installs and deploy builds.
+    "unlisted-dependencies": "error",
+    // Broken module resolution must always block.
+    "unresolved-imports": "error",
+    // Runtime import cycles must always block.
+    "circular-dependencies": "error",
+    // Barrel cycles silently drop re-exports.
+    "re-export-cycle": "error"
+  }
+}

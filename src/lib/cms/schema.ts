@@ -7,7 +7,7 @@
 
 import { z } from "zod";
 
-export const cmsImageSchema = z.object({
+const cmsImageSchema = z.object({
   id: z.string(),
   url: z.string(),
   thumbUrl: z.string(),
@@ -19,7 +19,7 @@ export const cmsImageSchema = z.object({
   blurDataUrl: z.string().nullable().default(null),
 });
 
-export const cmsUnitSummarySchema = z.object({
+const cmsUnitSummarySchema = z.object({
   slug: z.string(),
   title: z.string(),
   layoutLabel: z.string().nullable(),
@@ -32,7 +32,7 @@ export const cmsUnitSummarySchema = z.object({
   hero: cmsImageSchema.nullable(),
 });
 
-export const cmsBuildingSummarySchema = z.object({
+const cmsBuildingSummarySchema = z.object({
   slug: z.string(),
   name: z.string(),
   neighborhood: z.string().nullable(),
@@ -41,7 +41,7 @@ export const cmsBuildingSummarySchema = z.object({
   unitCount: z.number(),
 });
 
-export const cmsBuildingSchema = cmsBuildingSummarySchema.extend({
+const cmsBuildingSchema = cmsBuildingSummarySchema.extend({
   // Sanitized rich-text HTML (the CMS sanitizes on write). Render via
   // `dangerouslySetInnerHTML`; use `descriptionToPlainText()` for meta/JSON-LD.
   description: z.string().nullable(),
@@ -61,18 +61,18 @@ export const cmsBuildingSchema = cmsBuildingSummarySchema.extend({
  * footer, contact page). Both fields may be empty strings when unset — callers
  * fall back to the static `siteConfig` values in that case.
  */
-export const cmsCompanyInfoSchema = z.object({
+const cmsCompanyInfoSchema = z.object({
   email: z.string(),
   phone: z.string(),
 });
 
 /** Active operational inventory used by the public maintenance form. */
-export const maintenanceUnitBuildingSchema = z.object({
+const maintenanceUnitBuildingSchema = z.object({
   name: z.string().min(1),
   units: z.array(z.string().min(1)),
 });
 
-export const maintenanceUnitInventorySchema = z.object({
+const maintenanceUnitInventorySchema = z.object({
   buildings: z.array(maintenanceUnitBuildingSchema),
 });
 

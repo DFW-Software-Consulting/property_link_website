@@ -56,7 +56,7 @@ export const siteConfig = {
 } as const;
 
 /** Primary navigation. `upcoming` items are reserved for later phases. */
-export const navItems: NavItem[] = [
+const navItems: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
   { label: "Services", href: "/services" },
