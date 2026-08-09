@@ -15,7 +15,7 @@ import { siteConfig } from "@/lib/site-config";
 export const metadata: Metadata = {
   title: "Contact Us",
   description:
-    "Contact PropertyLink NYC about 30-day furnished stays, 12-month leases, and corporate housing in Manhattan. Call 888-622-0772 or send us a message — we respond within one business day.",
+    "Contact PropertyLink NYC about furnished stays of 30 days or more, 12-month leases, and corporate housing in Manhattan. Call 888-622-0772 — we respond within one business day.",
 };
 
 export default async function ContactPage({

@@ -45,7 +45,7 @@ const faqs = [
   {
     question: "What's the minimum stay?",
     answer:
-      "Short-term furnished stays start at 30 days. For those who want to settle in, long-term leases are available.",
+      "Short-term furnished stays start at 30 days. For those who want to settle in, 12-month leases are available.",
   },
   {
     question: "What's included in a furnished unit?",

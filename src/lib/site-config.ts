@@ -30,7 +30,7 @@ export const siteConfig = {
   shortName: "PropertyLink NYC",
   url: "https://www.propertylinknyc.com",
   description:
-    "PropertyLink NYC offers move-in-ready furnished apartments for 30-day stays and 12-month leases across Manhattan. We own and manage every building we rent — from Little Italy to the Upper East Side.",
+    "PropertyLink NYC offers move-in-ready furnished apartments for stays of 30 days or more and 12-month leases across Manhattan. We own and manage every building we rent — from Little Italy to the Upper East Side.",
   tagline: "New York City's premier furnished housing provider.",
   foundedYear: 2015,
   phone: {
