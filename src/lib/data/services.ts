@@ -29,7 +29,8 @@ export const services: Service[] = [
     id: "long-term",
     icon: KeyRound,
     title: "Residences",
-    tagline: "Settle into a building owned and managed by one team.",
+    tagline:
+      "Settle into a 12-month lease in a building owned and managed by one team.",
     description:
       "Make Manhattan home with the convenience of an owner-operated building and a management team that actually answers the phone.",
     features: [

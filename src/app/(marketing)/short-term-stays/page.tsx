@@ -18,7 +18,7 @@ import {
 export const revalidate = 60;
 
 const PAGE_DESCRIPTION =
-  "Move-in-ready furnished short-term stays across Manhattan — flexible terms from 30 nights, with Wi-Fi, utilities, linens, and full kitchens included. Every home is in a building PropertyLink owns and manages.";
+  "Move-in-ready furnished stays of 30 days or more across Manhattan, with Wi-Fi, utilities, linens, and full kitchens included. Every home is in a building PropertyLink owns and manages.";
 
 export const metadata: Metadata = {
   title: "Short-Term Stays",
@@ -66,8 +66,8 @@ export default async function ShortTermStaysPage({
           <SectionHeading
             as="h1"
             eyebrow="Short-term stays"
-            title="Furnished short-term stays in Manhattan"
-            description="Fully furnished, move-in-ready homes with flexible terms from 30 nights — ideal for relocations, renovations, and extended visits. Every building below is one we own and manage end-to-end; explore a property and we'll match you to the right home for your dates."
+            title="Furnished short-term stays in Manhattan, 30+ days"
+            description="Fully furnished, move-in-ready homes for stays of 30 days or more — ideal for relocations, renovations, and extended visits. Every building below is one we own and manage end-to-end; explore a property and we'll match you to the right home for your dates."
           />
         </Container>
       </Section>

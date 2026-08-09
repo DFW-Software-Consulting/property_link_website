@@ -19,8 +19,8 @@ export function SiteFooter({ contact }: { contact: SiteContactInfo }) {
           <div className="flex flex-col gap-4">
             <Logo />
             <p className="max-w-xs text-sm text-muted-foreground">
-              {siteConfig.tagline} Furnished short- and long-term homes in
-              buildings we own.
+              {siteConfig.tagline} Furnished homes in buildings we own — 30-day
+              minimum stays and 12-month leases.
             </p>
             <div className="flex items-center gap-2">
               <a
