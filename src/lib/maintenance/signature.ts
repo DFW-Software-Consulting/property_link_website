@@ -46,6 +46,7 @@ export function verify(
   signature: string,
   secret: string,
 ): boolean {
+  if (typeof signature !== "string" || signature.length === 0) return false;
   const expected = sign(payload, secret);
   const a = Buffer.from(expected, "hex");
   const b = Buffer.from(signature, "hex");

@@ -125,25 +125,35 @@ describe("POST /api/contact", () => {
     expect(mocks.sendContactNotification).not.toHaveBeenCalled();
   });
 
-  it("returns success without delivery when email is not configured", async () => {
+  it("returns unavailable when email is not configured", async () => {
     mocks.isEmailConfigured.mockReturnValue(false);
 
     const response = await POST(createRequest(validBody, "203.0.113.5"));
 
-    expect(response.status).toBe(201);
-    await expect(response.json()).resolves.toEqual({ ok: true });
+    expect(response.status).toBe(503);
+    await expect(response.json()).resolves.toEqual({ error: expect.any(String) });
     expect(mocks.render).not.toHaveBeenCalled();
     expect(mocks.sendContactNotification).not.toHaveBeenCalled();
   });
 
-  it("treats email rendering or delivery failure as best effort", async () => {
+  it("returns bad gateway when email delivery fails", async () => {
     mocks.sendContactNotification.mockRejectedValue(new Error("SMTP failure"));
 
     const response = await POST(createRequest(validBody, "203.0.113.6"));
 
-    expect(response.status).toBe(201);
-    await expect(response.json()).resolves.toEqual({ ok: true });
+    expect(response.status).toBe(502);
+    await expect(response.json()).resolves.toEqual({ error: expect.any(String) });
     expect(mocks.sendContactNotification).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns bad gateway when email rendering fails", async () => {
+    mocks.render.mockRejectedValue(new Error("Render failure"));
+
+    const response = await POST(createRequest(validBody, "203.0.113.8"));
+
+    expect(response.status).toBe(502);
+    await expect(response.json()).resolves.toEqual({ error: expect.any(String) });
+    expect(mocks.sendContactNotification).not.toHaveBeenCalled();
   });
 
   it("rate limits the sixth request from one IP before sending", async () => {

@@ -61,37 +61,45 @@ export async function POST(request: Request) {
   const email = data.email.trim();
   const building = data.building?.trim() || undefined;
 
-  if (isEmailConfigured()) {
-    const element = (
-      <ContactNotificationEmail
-        name={name}
-        email={email}
-        phone={data.phone?.trim() || undefined}
-        inquiryType={data.inquiryType}
-        building={building}
-        company={data.company?.trim() || undefined}
-        moveInDate={data.moveInDate?.trim() || undefined}
-        message={data.message.trim()}
-      />
-    );
-    try {
-      const [html, text] = await Promise.all([
-        render(element),
-        render(element, { plainText: true }),
-      ]);
-      await sendContactNotification({
-        subject: `New ${inquiryTypeLabels[data.inquiryType]} inquiry from ${name}${
-          building ? ` — ${building}` : ""
-        }`,
-        html,
-        text,
-        replyTo: email,
-      });
-    } catch (error) {
-      console.error("[contact] email notification failed:", error);
-    }
-  } else {
+  if (!isEmailConfigured()) {
     console.warn("[contact] email not configured — inquiry not delivered.");
+    return NextResponse.json(
+      { error: "Contact form is temporarily unavailable." },
+      { status: 503 },
+    );
+  }
+
+  const element = (
+    <ContactNotificationEmail
+      name={name}
+      email={email}
+      phone={data.phone?.trim() || undefined}
+      inquiryType={data.inquiryType}
+      building={building}
+      company={data.company?.trim() || undefined}
+      moveInDate={data.moveInDate?.trim() || undefined}
+      message={data.message.trim()}
+    />
+  );
+  try {
+    const [html, text] = await Promise.all([
+      render(element),
+      render(element, { plainText: true }),
+    ]);
+    await sendContactNotification({
+      subject: `New ${inquiryTypeLabels[data.inquiryType]} inquiry from ${name}${
+        building ? ` — ${building}` : ""
+      }`,
+      html,
+      text,
+      replyTo: email,
+    });
+  } catch (error) {
+    console.error("[contact] email notification failed:", error);
+    return NextResponse.json(
+      { error: "We couldn't send your message. Please try again." },
+      { status: 502 },
+    );
   }
 
   return NextResponse.json({ ok: true }, { status: 201 });

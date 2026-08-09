@@ -43,9 +43,10 @@ describe("maintenance signatures", () => {
     },
   );
 
-  it("currently throws when a caller passes a missing signature", () => {
-    // This documents the runtime boundary weakness: the TypeScript string type
-    // does not protect an API caller that supplies undefined.
-    expect(() => verify(payload, undefined as never, secret)).toThrow(TypeError);
-  });
+  it.each([undefined, null])(
+    "rejects a non-string signature without throwing: %j",
+    (signature) => {
+      expect(verify(payload, signature as never, secret)).toBe(false);
+    },
+  );
 });
