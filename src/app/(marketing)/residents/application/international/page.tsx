@@ -7,7 +7,7 @@ import { InternationalInquiryForm } from "@/components/application/international
 export const metadata: Metadata = {
   title: "International Rental Application",
   description:
-    "International residents can send PropertyLink NYC a rental application inquiry and our leasing team will follow up with the next steps.",
+    "International residents can submit a PropertyLink NYC rental application online, including passport details and references, and our leasing team will follow up with the next steps.",
 };
 
 export default function InternationalApplicationPage() {
@@ -18,7 +18,7 @@ export default function InternationalApplicationPage() {
           as="h1"
           eyebrow="Rental application"
           title="International Residents"
-          description="International applicants cannot complete U.S. credit screening online. Send us a few details and our leasing team will follow up with the next steps."
+          description="International applicants cannot complete U.S. credit screening online. Complete the application below — including a copy of your passport — and our leasing team will follow up with the next steps."
         />
         <InternationalInquiryForm />
       </Container>
