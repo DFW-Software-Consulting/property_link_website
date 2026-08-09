@@ -45,7 +45,7 @@ export async function generateMetadata({
   // `description` is now sanitized rich-text HTML; flatten it for meta/OG tags.
   const description =
     descriptionToPlainText(building.description) ||
-    `Long-term furnished rentals at ${building.name}${where} — a building PropertyLink owns and manages.`;
+    `12-month furnished leases at ${building.name}${where} — a building PropertyLink owns and manages.`;
   const path = `/residences/${building.slug}`;
   const ogImages = building.hero
     ? [

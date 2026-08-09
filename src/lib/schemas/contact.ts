@@ -15,8 +15,8 @@ export const INQUIRY_TYPES = [
 export type InquiryType = (typeof INQUIRY_TYPES)[number];
 
 export const inquiryTypeLabels: Record<InquiryType, string> = {
-  short_term: "Short-term furnished stay",
-  long_term: "Long-term rental",
+  short_term: "Short-term stay (30+ days)",
+  long_term: "Long-term lease (12 months)",
   corporate: "Corporate / relocation",
   general: "General question",
 };
