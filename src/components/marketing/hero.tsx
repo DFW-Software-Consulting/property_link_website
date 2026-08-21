@@ -3,7 +3,6 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 export function Hero() {
   return (
@@ -21,10 +20,6 @@ export function Hero() {
         aria-hidden
       />
       <Container className="flex flex-col justify-center gap-6 py-24 text-primary-foreground sm:py-32 lg:py-40">
-        <Badge className="w-fit gap-1.5 bg-primary-foreground/10 text-primary-foreground ring-1 ring-primary-foreground/20">
-          <span className="size-1.5 rounded-full bg-brand" aria-hidden />
-          Owner-operated since 2015
-        </Badge>
         <h1 className="max-w-3xl font-heading text-4xl font-semibold text-balance sm:text-5xl lg:text-6xl">
           Furnished Manhattan apartments, in buildings we own.
         </h1>
