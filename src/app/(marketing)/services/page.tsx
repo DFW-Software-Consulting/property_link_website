@@ -50,7 +50,7 @@ const faqs = [
   {
     question: "What's included in a furnished unit?",
     answer:
-      "Wi-Fi, heat and hot water, air conditioning, fresh linens, and a full kitchen. Arrive with a suitcase — everything else is already there.",
+      "Wi-Fi, heat and hot water, air conditioning, fresh linens, and a full kitchen — all set up for you, with electricity billed to your own account. Arrive with a suitcase; everything else is already there.",
   },
   {
     question: "Are pets allowed?",
@@ -97,7 +97,7 @@ export default function ServicesPage() {
           <SectionHeading
             eyebrow="What's included"
             title="Every home comes ready for daily life"
-            description="No setup, no separate utility accounts, no waiting — these come standard in every furnished unit."
+            description="No setup, no waiting — these come standard in every furnished unit."
           />
           <div className="grid gap-x-8 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
             {amenities.map((amenity) => (

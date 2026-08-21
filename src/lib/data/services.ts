@@ -20,7 +20,7 @@ export const services: Service[] = [
       "A cost-effective, far more comfortable alternative to an extended hotel stay. Move in with nothing but a suitcase — everything else is already here.",
     features: [
       "Move-in ready with furniture, linens, and a full kitchen",
-      "All utilities, Wi-Fi, and air conditioning included",
+      "Utilities, Wi-Fi, and air conditioning are set up for you",
       "Flexible move-in and move-out dates",
       "Ideal for relocations, medical stays, and time between homes",
     ],
