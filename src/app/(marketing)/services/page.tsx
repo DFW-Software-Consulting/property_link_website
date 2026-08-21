@@ -59,7 +59,7 @@ const faqs = [
   {
     question: "Which neighborhoods do you cover?",
     answer:
-      "Little Italy, Hell's Kitchen, Midtown West, and the Upper East Side — all in buildings we own and manage.",
+      "Little Italy, Hell's Kitchen, Midtown West, the Upper East Side, and Bowery — all in buildings we own and manage.",
   },
   {
     question: "How do I apply?",

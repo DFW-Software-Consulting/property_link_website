@@ -42,6 +42,11 @@ const neighborhoods = [
     name: "Upper East Side",
     description: "Classic blocks beside Central Park and Museum Mile.",
   },
+  {
+    name: "Bowery",
+    description:
+      "Galleries and historic tenements bordering NoHo, the East Village, and Chinatown.",
+  },
 ];
 
 export default function AboutPage() {
@@ -97,7 +102,7 @@ export default function AboutPage() {
           <SectionHeading
             eyebrow="Where we are"
             title="Neighborhoods we serve"
-            description="Our buildings sit in four of Manhattan's most connected and characterful neighborhoods."
+            description="Our buildings sit in five of Manhattan's most connected and characterful neighborhoods."
           />
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {neighborhoods.map((neighborhood) => (
