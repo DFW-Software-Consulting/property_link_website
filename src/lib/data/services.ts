@@ -35,7 +35,7 @@ export const services: Service[] = [
       "Make Manhattan home with the convenience of an owner-operated building and a management team that actually answers the phone.",
     features: [
       "Furnished and unfurnished options",
-      "Responsive, accountable on-site management",
+      "Responsive, accountable management — we send our team when you need us",
       "Pet-friendly buildings",
       "Prime, transit-rich neighborhoods",
     ],
