@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Section } from "@/components/sections/section";
 import { SectionHeading } from "@/components/sections/section-heading";
 import { Container } from "@/components/layout/container";
@@ -63,8 +64,20 @@ const faqs = [
   },
   {
     question: "How do I apply?",
-    answer:
-      "Reach out through our contact form or call 888-622-0772. We welcome both U.S. and international residents and respond within one business day.",
+    answer: (
+      <>
+        Start your{" "}
+        <Link
+          href="/residents/application"
+          className="font-medium text-brand-strong underline-offset-4 hover:underline"
+        >
+          application
+        </Link>{" "}
+        online, or reach out through our contact form or call 888-622-0772. We
+        welcome both U.S. and international residents and respond within one
+        business day.
+      </>
+    ),
   },
 ];
 
