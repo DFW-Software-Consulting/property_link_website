@@ -20,7 +20,6 @@ const differentiators = [
   "One accountable team owns, manages, and maintains every building.",
   "We know our inventory firsthand, so we match you to the right home.",
   "Direct answers on availability, pricing, and move-in timelines.",
-  "Five-star service that continues throughout your entire stay.",
 ];
 
 const neighborhoods = [
