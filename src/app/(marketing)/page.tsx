@@ -74,7 +74,7 @@ export default function HomePage() {
           <SectionHeading
             eyebrow="What's included"
             title="Everything's already here"
-            description="Each furnished home comes ready for daily life — no setup, no separate utility accounts, no waiting."
+            description="Each furnished home comes ready for daily life — no setup, no waiting."
           />
           <div className="grid gap-x-8 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
             {amenities.map((amenity) => (

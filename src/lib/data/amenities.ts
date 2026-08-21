@@ -24,7 +24,7 @@ export const amenities: Amenity[] = [
   {
     icon: Flame,
     label: "Heat & hot water",
-    description: "Utilities handled — no setup, no separate bills.",
+    description: "In place in every unit — electricity billed separately.",
   },
   {
     icon: Snowflake,
