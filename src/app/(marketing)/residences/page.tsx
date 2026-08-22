@@ -73,7 +73,7 @@ export default async function LongTermRentalsPage({
             as="h1"
             eyebrow="Residences"
             title="Find your home in Manhattan"
-            description="Each building below is one we own and manage end-to-end, with 12-month leases available. Explore a property to see its available layouts, then reach out and we'll match you to the right home."
+            description="Each building below is one we own and manage end-to-end, with 12-month leases and furnished stays of 30 days or more available. Explore a property to see its available layouts, then reach out and we'll match you to the right home."
           />
         </Container>
       </Section>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Section } from "@/components/sections/section";
 import { SectionHeading } from "@/components/sections/section-heading";
 import { Container } from "@/components/layout/container";
@@ -50,7 +51,7 @@ const faqs = [
   {
     question: "What's included in a furnished unit?",
     answer:
-      "Wi-Fi, heat and hot water, air conditioning, fresh linens, and a full kitchen. Arrive with a suitcase — everything else is already there.",
+      "Wi-Fi, heat and hot water, air conditioning, fresh linens, and a full kitchen — all set up for you, with electricity billed to your own account. Arrive with a suitcase; everything else is already there.",
   },
   {
     question: "Are pets allowed?",
@@ -59,12 +60,24 @@ const faqs = [
   {
     question: "Which neighborhoods do you cover?",
     answer:
-      "Little Italy, Hell's Kitchen, Midtown West, and the Upper East Side — all in buildings we own and manage.",
+      "Little Italy, Hell's Kitchen, Midtown West, the Upper East Side, and Bowery — all in buildings we own and manage.",
   },
   {
     question: "How do I apply?",
-    answer:
-      "Reach out through our contact form or call 888-622-0772. We welcome both U.S. and international residents and respond within one business day.",
+    answer: (
+      <>
+        Start your{" "}
+        <Link
+          href="/residents/application"
+          className="font-medium text-brand-strong underline-offset-4 hover:underline"
+        >
+          application
+        </Link>{" "}
+        online, or reach out through our contact form or call 888-622-0772. We
+        welcome both U.S. and international residents and respond within one
+        business day.
+      </>
+    ),
   },
 ];
 
@@ -97,7 +110,7 @@ export default function ServicesPage() {
           <SectionHeading
             eyebrow="What's included"
             title="Every home comes ready for daily life"
-            description="No setup, no separate utility accounts, no waiting — these come standard in every furnished unit."
+            description="No setup, no waiting — these come standard in every furnished unit."
           />
           <div className="grid gap-x-8 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
             {amenities.map((amenity) => (
