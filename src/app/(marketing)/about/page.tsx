@@ -20,7 +20,6 @@ const differentiators = [
   "One accountable team owns, manages, and maintains every building.",
   "We know our inventory firsthand, so we match you to the right home.",
   "Direct answers on availability, pricing, and move-in timelines.",
-  "Five-star service that continues throughout your entire stay.",
 ];
 
 const neighborhoods = [
@@ -41,6 +40,11 @@ const neighborhoods = [
   {
     name: "Upper East Side",
     description: "Classic blocks beside Central Park and Museum Mile.",
+  },
+  {
+    name: "Bowery",
+    description:
+      "Galleries and historic tenements bordering NoHo, the East Village, and Chinatown.",
   },
 ];
 
@@ -97,7 +101,7 @@ export default function AboutPage() {
           <SectionHeading
             eyebrow="Where we are"
             title="Neighborhoods we serve"
-            description="Our buildings sit in four of Manhattan's most connected and characterful neighborhoods."
+            description="Our buildings sit in five of Manhattan's most connected and characterful neighborhoods."
           />
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {neighborhoods.map((neighborhood) => (

@@ -50,8 +50,8 @@ export default async function MaintenanceRequestPage() {
                     aria-hidden
                   />
                   <span>
-                    We aim to acknowledge non-urgent requests within one
-                    business day.
+                    We aim to acknowledge non-urgent requests in a timely
+                    manner.
                   </span>
                 </li>
               </ul>
