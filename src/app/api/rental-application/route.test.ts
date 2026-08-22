@@ -34,9 +34,10 @@ function makeForm(overrides: Record<string, string> = {}): FormData {
   return form;
 }
 
-function makeRequest(form: FormData): Request {
+function makeRequest(form: FormData, headers?: Record<string, string>): Request {
   return new Request("https://example.com/api/rental-application", {
     method: "POST",
+    headers,
     body: form,
   });
 }
@@ -113,5 +114,68 @@ describe("POST /api/rental-application", () => {
     const res = await POST(makeRequest(makeForm({ website: "https://bot" })));
     expect(res.status).toBe(200);
     expect(mockSendEmail).not.toHaveBeenCalled();
+  });
+
+  it("returns 400 when the request body isn't parseable as form data", async () => {
+    const res = await POST(
+      new Request("https://example.com/api/rental-application", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "not form data",
+      }),
+    );
+    expect(res.status).toBe(400);
+    expect(mockSendEmail).not.toHaveBeenCalled();
+  });
+
+  it("accepts a minimal submission with every optional field blank", async () => {
+    const res = await POST(
+      makeRequest(
+        makeForm({
+          phone: "",
+          building: "",
+          moveInDate: "",
+          captchaToken: "",
+        }),
+      ),
+    );
+    expect(res.status).toBe(201);
+    expect(mockSendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject: "[Rental Application] John Doe — NYC",
+      }),
+    );
+  });
+
+  it("includes occupants and message in the email when provided", async () => {
+    const res = await POST(
+      makeRequest(makeForm({ occupants: "3", message: "Looking forward to it" })),
+    );
+    expect(res.status).toBe(201);
+    expect(mockSendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: expect.stringContaining("Looking forward to it"),
+        text: expect.stringContaining("Occupants: 3"),
+      }),
+    );
+  });
+
+  it("tracks rate limits per IP from the x-forwarded-for header", async () => {
+    const form = makeForm();
+    for (let i = 0; i < 5; i++) {
+      const res = await POST(
+        makeRequest(form, { "x-forwarded-for": "203.0.113.5" }),
+      );
+      expect(res.status).toBe(201);
+    }
+    const blocked = await POST(
+      makeRequest(form, { "x-forwarded-for": "203.0.113.5" }),
+    );
+    expect(blocked.status).toBe(429);
+
+    const otherIp = await POST(
+      makeRequest(form, { "x-forwarded-for": "203.0.113.9, 10.0.0.1" }),
+    );
+    expect(otherIp.status).toBe(201);
   });
 });
