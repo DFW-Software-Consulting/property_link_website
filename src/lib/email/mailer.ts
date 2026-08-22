@@ -75,6 +75,37 @@ export async function sendContactNotification(
   });
 }
 
+/* --------------------------- rental application -------------------------- */
+
+/** True when SMTP plus the rental-application to/from addresses are present. */
+export function isRentalApplicationConfigured(): boolean {
+  return (
+    isSmtpConfigured() &&
+    Boolean((env.RENTAL_APPLICATION_TO || env.CONTACT_TO) && env.FROM_ADDRESS)
+  );
+}
+
+export async function sendRentalApplicationEmail(
+  params: SendParams,
+): Promise<void> {
+  const to = env.RENTAL_APPLICATION_TO || env.CONTACT_TO;
+  const from = env.FROM_ADDRESS;
+  if (!to || !from) {
+    throw new Error(
+      "Rental application email is not configured (missing RENTAL_APPLICATION_TO / FROM_ADDRESS environment variables).",
+    );
+  }
+
+  await getTransporter().sendMail({
+    from,
+    to,
+    replyTo: params.replyTo,
+    subject: params.subject,
+    html: params.html,
+    text: params.text,
+  });
+}
+
 /* ------------------------- maintenance requests -------------------------- */
 
 /**

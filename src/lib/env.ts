@@ -50,6 +50,11 @@ const envSchema = z.object({
   // verification is skipped — production MUST set it. The matching public site
   // key is read client-side from NEXT_PUBLIC_TURNSTILE_SITE_KEY.
   TURNSTILE_SECRET_KEY: z.string().optional(),
+
+  // USA rental application inbox + from-address. The API route checks these at
+  // send time and refuses (503) when either is missing.
+  RENTAL_APPLICATION_TO: z.string().optional(),
+  FROM_ADDRESS: z.string().optional(),
 });
 
 export const env = envSchema.parse(process.env);

@@ -3,6 +3,7 @@ import { ExternalLink } from "lucide-react";
 import { Container } from "@/components/layout/container";
 import { Section } from "@/components/sections/section";
 import { SectionHeading } from "@/components/sections/section-heading";
+import { RentalApplicationForm } from "@/components/application/rental-application-form";
 import { WEIMARK_APPLICATION_URL } from "@/lib/application";
 
 export const metadata: Metadata = {
@@ -44,6 +45,15 @@ export default function UsaApplicationPage() {
             className="block min-h-[1800px] w-full border-0"
           />
         </div>
+
+        <SectionHeading
+          as="h2"
+          eyebrow="Contact our leasing team"
+          title="Prefer to apply directly?"
+          description="Send your information to our office and our leasing team will be in touch."
+        />
+
+        <RentalApplicationForm />
       </Container>
     </Section>
   );
