@@ -3,6 +3,7 @@ import { Check } from "lucide-react";
 import { Section } from "@/components/sections/section";
 import { SectionHeading } from "@/components/sections/section-heading";
 import { Container } from "@/components/layout/container";
+import { VideoHero } from "@/components/marketing/video-hero";
 import { TrustBar } from "@/components/marketing/trust-bar";
 import { LogoStrip } from "@/components/marketing/logo-strip";
 import { TestimonialCard } from "@/components/marketing/testimonial-card";
@@ -51,16 +52,11 @@ const neighborhoods = [
 export default function AboutPage() {
   return (
     <>
-      <Section tone="muted" spacing="sm">
-        <Container className="flex max-w-3xl flex-col gap-5 py-8">
-          <SectionHeading
-            as="h1"
-            eyebrow="About PropertyLink NYC"
-            title="New York City's premier furnished housing provider"
-            description="Since 2015, we've taken a different approach to renting in Manhattan: we only offer apartments in buildings we own. That means one team is responsible for your home — and your experience — from start to finish."
-          />
-        </Container>
-      </Section>
+      <VideoHero
+        eyebrow="About PropertyLink NYC"
+        title="New York City's premier furnished housing provider"
+        description="Since 2015, we've taken a different approach to renting in Manhattan: we only offer apartments in buildings we own. That means one team is responsible for your home — and your experience — from start to finish."
+      />
 
       <TrustBar />
 
