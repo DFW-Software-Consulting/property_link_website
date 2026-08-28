@@ -44,7 +44,7 @@ const valueProps = [
     icon: PawPrint,
     title: "Pet-friendly",
     description:
-      "Bring the whole household — pets are welcome, though weight limits, a pet deposit, and approval may apply.",
+      "Bring the whole household — pets are welcome. Some restrictions may apply.",
   },
 ];
 

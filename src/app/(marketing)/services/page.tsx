@@ -56,7 +56,7 @@ const faqs = [
   {
     question: "Are pets allowed?",
     answer:
-      "Yes. Pets are welcome, though weight limits, a pet deposit, and approval may apply.",
+      "Yes, pets are welcome. Some restrictions may apply.",
   },
   {
     question: "Which neighborhoods do you cover?",
