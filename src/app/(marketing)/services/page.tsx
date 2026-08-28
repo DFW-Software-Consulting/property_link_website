@@ -55,7 +55,8 @@ const faqs = [
   },
   {
     question: "Are pets allowed?",
-    answer: "Yes. Our buildings are pet-friendly, so the whole household is welcome.",
+    answer:
+      "Yes. Pets are welcome, though weight limits, a pet deposit, and approval may apply.",
   },
   {
     question: "Which neighborhoods do you cover?",
