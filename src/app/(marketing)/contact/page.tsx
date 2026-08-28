@@ -43,7 +43,6 @@ export default async function ContactPage({
           as="h1"
           eyebrow="Contact"
           title="Let's find your New York home"
-          description="Tell us what you're looking for and we'll respond within one business day."
         />
 
         <div className="grid gap-10 lg:grid-cols-[1.25fr_1fr]">
