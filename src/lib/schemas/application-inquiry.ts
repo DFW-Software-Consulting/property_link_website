@@ -61,7 +61,7 @@ export const GENDER_LABELS: Record<(typeof GENDER_OPTIONS)[number], string> = {
   "prefer-not-to-say": "Prefer not to say",
 };
 
-export const YES_NO_OPTIONS = ["yes", "no"] as const;
+const YES_NO_OPTIONS = ["yes", "no"] as const;
 
 export const applicationInquirySchema = z.object({
   /* ------------------------------ applicant ------------------------------ */
@@ -175,12 +175,11 @@ export const applicationInquirySchema = z.object({
 export type ApplicationInquiryInput = z.input<
   typeof applicationInquirySchema
 >;
-export type ApplicationInquiryData = z.infer<typeof applicationInquirySchema>;
 
 /* ---------------------------- passport upload ---------------------------- */
 
-export const MAX_PASSPORT_BYTES = 8 * 1024 * 1024; // ~8 MB
-export const ACCEPTED_PASSPORT_TYPES = [
+const MAX_PASSPORT_BYTES = 8 * 1024 * 1024; // ~8 MB
+const ACCEPTED_PASSPORT_TYPES = [
   "image/jpeg",
   "image/png",
   "image/webp",

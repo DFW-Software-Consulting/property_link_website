@@ -8,7 +8,7 @@ import { sign } from "./signature";
 
 const FORM_VERSION = 1 as const;
 
-export const PERMISSION_TO_ENTER = ["yes", "no", "coordinate"] as const;
+const PERMISSION_TO_ENTER = ["yes", "no", "coordinate"] as const;
 export type PermissionToEnter = (typeof PERMISSION_TO_ENTER)[number];
 
 export type MaintenancePhotoMeta = {

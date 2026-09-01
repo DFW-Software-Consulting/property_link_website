@@ -41,7 +41,7 @@ export function isEmailConfigured(): boolean {
 }
 
 /** A file attached to an outgoing message, in nodemailer's shape. */
-export type EmailAttachment = {
+type EmailAttachment = {
   filename: string;
   content: Buffer;
   contentType: string;
