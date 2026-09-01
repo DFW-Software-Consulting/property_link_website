@@ -5,32 +5,30 @@ import {
 } from "@/lib/email/mailer";
 import { verifyCaptcha } from "@/lib/maintenance/captcha";
 import { rentalApplicationSchema } from "@/lib/schemas/rental-application";
+import { createRateLimiter } from "@/lib/rate-limit";
+import {
+  multilineTextToHtml,
+  normalizeEmailLineEndings,
+} from "@/lib/email/multiline-text";
+import {
+  createFormFieldGetter,
+  getClientIp,
+  isHoneypotFilled,
+} from "@/lib/request-helpers";
 
 export const runtime = "nodejs";
 
 const RATE_LIMIT = 5;
 const WINDOW_MS = 10 * 60 * 1000;
-const hits = new Map<string, { count: number; resetAt: number }>();
+const rateLimiter = createRateLimiter(RATE_LIMIT, WINDOW_MS);
 
 /** Test-only: clear the rate-limit window. */
 export function __resetRateLimiter(): void {
-  hits.clear();
-}
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = hits.get(ip);
-  if (!entry || now > entry.resetAt) {
-    hits.set(ip, { count: 1, resetAt: now + WINDOW_MS });
-    return false;
-  }
-  entry.count += 1;
-  return entry.count > RATE_LIMIT;
+  rateLimiter.reset();
 }
 
 export async function POST(request: Request) {
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const ip = getClientIp(request);
 
   let form: FormData;
   try {
@@ -42,16 +40,13 @@ export async function POST(request: Request) {
     );
   }
 
-  const getField = (key: string): string => {
-    const value = form.get(key);
-    return typeof value === "string" ? value : "";
-  };
+  const getField = createFormFieldGetter(form);
 
-  if (getField("website").trim() !== "") {
+  if (isHoneypotFilled(getField("website"))) {
     return NextResponse.json({ ok: true }, { status: 200 });
   }
 
-  if (isRateLimited(ip)) {
+  if (rateLimiter.isRateLimited(ip)) {
     return NextResponse.json(
       { error: "Too many requests. Please try again later." },
       { status: 429 },
@@ -105,7 +100,9 @@ export async function POST(request: Request) {
   const moveInDate = data.moveInDate?.trim() || undefined;
   const occupantsValue =
     data.occupants != null ? String(data.occupants) : undefined;
-  const message = data.message?.trim() || undefined;
+  const message = data.message
+    ? normalizeEmailLineEndings(data.message.trim()) || undefined
+    : undefined;
 
   const rows: Array<[string, string | undefined]> = [
     ["Full name", fullName],
@@ -126,7 +123,7 @@ export async function POST(request: Request) {
 
   const html = `<table style="border-collapse:collapse">${htmlRows}</table>${
     message
-      ? `<hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0"/><p style="font-weight:700;margin:0 0 4px">Message</p><p style="white-space:pre-wrap;margin:0">${message}</p>`
+      ? `<hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0"/><p style="font-weight:700;margin:0 0 4px">Message</p><p style="line-height:20px;margin:0">${multilineTextToHtml(message)}</p>`
       : ""
   }`;
 

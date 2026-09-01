@@ -149,13 +149,25 @@ describe("POST /api/rental-application", () => {
 
   it("includes occupants and message in the email when provided", async () => {
     const res = await POST(
-      makeRequest(makeForm({ occupants: "3", message: "Looking forward to it" })),
+      makeRequest(
+        makeForm({
+          occupants: "3",
+          message: "First line\r\nSecond line\n\nFourth line",
+        }),
+      ),
     );
     expect(res.status).toBe(201);
     expect(mockSendEmail).toHaveBeenCalledWith(
       expect.objectContaining({
-        html: expect.stringContaining("Looking forward to it"),
+        html: expect.stringContaining(
+          "First line<br/>Second line<br/><br/>Fourth line",
+        ),
         text: expect.stringContaining("Occupants: 3"),
+      }),
+    );
+    expect(mockSendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        text: expect.stringContaining("First line\nSecond line\n\nFourth line"),
       }),
     );
   });

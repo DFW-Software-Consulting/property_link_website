@@ -6,21 +6,12 @@ import {
 } from "@/lib/schemas/contact";
 import { isEmailConfigured, sendContactNotification } from "@/lib/email/mailer";
 import { ContactNotificationEmail } from "@/emails/contact-notification";
+import { createRateLimiter } from "@/lib/rate-limit";
+import { getClientIp, isHoneypotFilled } from "@/lib/request-helpers";
 
 const RATE_LIMIT = 5;
 const WINDOW_MS = 10 * 60 * 1000;
-const hits = new Map<string, { count: number; resetAt: number }>();
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = hits.get(ip);
-  if (!entry || now > entry.resetAt) {
-    hits.set(ip, { count: 1, resetAt: now + WINDOW_MS });
-    return false;
-  }
-  entry.count += 1;
-  return entry.count > RATE_LIMIT;
-}
+const rateLimiter = createRateLimiter(RATE_LIMIT, WINDOW_MS);
 
 function readString(body: unknown, key: string): string | undefined {
   if (typeof body === "object" && body !== null && key in body) {
@@ -31,17 +22,16 @@ function readString(body: unknown, key: string): string | undefined {
 }
 
 export async function POST(request: Request) {
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const ip = getClientIp(request);
 
   const body: unknown = await request.json().catch(() => null);
 
   const honeypot = readString(body, "website");
-  if (honeypot && honeypot.trim() !== "") {
+  if (isHoneypotFilled(honeypot)) {
     return NextResponse.json({ ok: true }, { status: 200 });
   }
 
-  if (isRateLimited(ip)) {
+  if (rateLimiter.isRateLimited(ip)) {
     return NextResponse.json(
       { error: "Too many requests. Please try again later." },
       { status: 429 },
