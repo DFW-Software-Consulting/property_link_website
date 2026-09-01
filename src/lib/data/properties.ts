@@ -6,7 +6,7 @@ export type Property = {
   blurb: string;
 };
 
-/** The seven PropertyLink-owned buildings featured across the site. */
+/** The eight PropertyLink-owned buildings featured across the site. */
 export const properties: Property[] = [
   {
     slug: "138-bowery",
@@ -15,6 +15,14 @@ export const properties: Property[] = [
     image: "/images/properties/138-bowery.jpg",
     blurb:
       "A historic Bowery streetscape steps from the Grand St subway, with SoHo and NoHo at your door.",
+  },
+  {
+    slug: "134-136-bowery",
+    name: "134&136 Bowery",
+    neighborhood: "Bowery",
+    // TODO: placeholder — swap for a real 134&136 Bowery photo once one exists.
+    image: "/images/properties/138-bowery.jpg",
+    blurb: "Commercial space on the Bowery with retail, office, and loft units.",
   },
   {
     slug: "521-west-48",
