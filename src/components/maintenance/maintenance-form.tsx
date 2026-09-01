@@ -1,113 +1,42 @@
 "use client";
 
-import { useCallback, useId, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowRight, CheckCircle2, Upload, X } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import {
-  ACCEPTED_IMAGE_ACCEPT,
-  MAX_PHOTOS,
-  PERMISSION_OPTIONS,
-  PET_OPTIONS,
   maintenanceFormSchema,
   validatePhotos,
   type MaintenanceFormInput,
-  type PermissionValue,
 } from "@/lib/schemas/maintenance";
 import type { MaintenanceUnitInventory } from "@/lib/cms/types";
+import { siteConfig } from "@/lib/site-config";
+import { TURNSTILE_SITE_KEY } from "@/lib/turnstile";
+import { postFormRequest } from "@/lib/forms/post-form-request";
+import { createTextFieldProps } from "@/lib/forms/text-field-props";
+import { useTurnstileCaptcha } from "@/hooks/use-turnstile-captcha";
+import { usePhotoUpload } from "@/hooks/use-photo-upload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from "@/components/ui/combobox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { TurnstileWidget } from "@/components/maintenance/turnstile-widget";
-import { siteConfig } from "@/lib/site-config";
+import { Field } from "@/components/shared/form-field";
+import { CaptchaField } from "@/components/shared/captcha-field";
+import { HoneypotField } from "@/components/shared/honeypot-field";
+import { BuildingField, ApartmentField } from "./unit-inventory-fields";
+import { PermissionFieldset } from "./permission-fieldset";
+import { PetFieldset } from "./pet-fieldset";
+import { PhotoUploadField } from "./photo-upload-field";
 
-const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-
-type FieldProps = {
-  id: string;
-  label: string;
-  error?: string;
-  required?: boolean;
-  children: React.ReactNode;
-};
-
-function Field({ id, label, error, required, children }: FieldProps) {
-  return (
-    <div className="flex flex-col gap-2">
-      <Label htmlFor={id}>
-        {label}
-        {required ? <span aria-hidden className="text-destructive"> *</span> : null}
-      </Label>
-      {children}
-      {error ? (
-        <p id={`${id}-error`} role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
-      ) : null}
-    </div>
-  );
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-type ComboboxChangeEventDetails = {
-  reason: string;
-  cancel: () => void;
-};
-
-/**
- * Base UI's Combobox clears the committed value when Escape is pressed while
- * the popup is already closed — there's nothing open to dismiss. The native
- * `<select>` this replaced left the value untouched in that case, so cancel
- * Base UI's default handling and preserve the committed selection.
- */
-export function cancelIfEscapeKey(
-  eventDetails: ComboboxChangeEventDetails,
-): boolean {
-  if (eventDetails.reason !== "escape-key") return false;
-  eventDetails.cancel();
-  return true;
-}
-
-/**
- * Base UI keeps the previously committed value while the user free-types a
- * query that no longer matches it — only the displayed text changes. A
- * direct edit ("input-change") must invalidate that stale selection so a
- * mismatched value can never be submitted; syncs that follow a real
- * selection, a clear, or Escape use other reasons and are left alone.
- */
-export function isDirectComboboxTextEdit(reason: string): boolean {
-  return reason === "input-change";
-}
+export { cancelIfEscapeKey, isDirectComboboxTextEdit } from "@/lib/combobox-sync";
 
 async function submitMaintenanceRequest(formData: FormData) {
-  const res = await fetch("/api/maintenance", {
-    method: "POST",
-    body: formData,
-  });
-  if (!res.ok) {
-    const data = (await res.json().catch(() => null)) as
-      | { error?: string }
-      | null;
-    throw new Error(data?.error ?? "Failed to submit your request");
-  }
-  return res.json();
+  return postFormRequest(
+    "/api/maintenance",
+    formData,
+    "Failed to submit your request",
+  );
 }
 
 type MaintenanceFormProps = {
@@ -117,16 +46,17 @@ type MaintenanceFormProps = {
 export function MaintenanceForm({
   unitInventory = null,
 }: MaintenanceFormProps) {
-  const photosLabelId = useId();
-  const permissionLegendId = useId();
-  const petLegendId = useId();
-
-  const [photos, setPhotos] = useState<File[]>([]);
-  const [photoError, setPhotoError] = useState<string | null>(null);
-  const [captchaToken, setCaptchaToken] = useState("");
-  const [captchaError, setCaptchaError] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { photos, photoError, fileInputRef, addFiles, removePhoto, setPhotoError, resetPhotos } =
+    usePhotoUpload();
+  const {
+    captchaToken,
+    captchaError,
+    setCaptchaToken,
+    setCaptchaError,
+    handleVerify,
+    handleExpire,
+  } = useTurnstileCaptcha();
 
   const {
     register,
@@ -162,21 +92,13 @@ export function MaintenanceForm({
       (building) => building.name === selectedBuilding,
     )?.units ?? [];
 
-  const handleVerify = useCallback((token: string) => {
-    setCaptchaToken(token);
-    setCaptchaError(null);
-  }, []);
-  const handleExpire = useCallback(() => setCaptchaToken(""), []);
-
   const mutation = useMutation({
     mutationFn: submitMaintenanceRequest,
     onSuccess: () => {
       setIsSubmitted(true);
       reset();
-      setPhotos([]);
-      setPhotoError(null);
+      resetPhotos();
       setCaptchaToken("");
-      if (fileInputRef.current) fileInputRef.current.value = "";
     },
     onError: (error: Error) => {
       toast.error(
@@ -185,24 +107,6 @@ export function MaintenanceForm({
       );
     },
   });
-
-  function addFiles(incoming: FileList | null) {
-    if (!incoming || incoming.length === 0) return;
-    const next = [...photos, ...Array.from(incoming)].slice(0, MAX_PHOTOS);
-    const result = validatePhotos(next);
-    if (!result.ok) {
-      setPhotoError(result.error);
-      return;
-    }
-    setPhotoError(null);
-    setPhotos(next);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  }
-
-  function removePhoto(index: number) {
-    setPhotos((current) => current.filter((_, i) => i !== index));
-    setPhotoError(null);
-  }
 
   function handleSubmitAnother() {
     setIsSubmitted(false);
@@ -258,6 +162,8 @@ export function MaintenanceForm({
     );
   }
 
+  const text = createTextFieldProps(register, errors);
+
   return (
     <form
       onSubmit={handleSubmit(onValid)}
@@ -265,16 +171,7 @@ export function MaintenanceForm({
       className="flex flex-col gap-6 rounded-xl bg-card p-6 ring-1 ring-foreground/10 sm:p-8"
     >
       {/* Honeypot: hidden from users, attractive to bots. */}
-      <div className="sr-only" aria-hidden>
-        <label htmlFor="website">Website</label>
-        <input
-          id="website"
-          type="text"
-          tabIndex={-1}
-          autoComplete="off"
-          {...register("website")}
-        />
-      </div>
+      <HoneypotField register={register} />
 
       <div className="grid gap-5 sm:grid-cols-2">
         <Field
@@ -283,13 +180,7 @@ export function MaintenanceForm({
           required
           error={errors.firstName?.message}
         >
-          <Input
-            id="firstName"
-            autoComplete="given-name"
-            aria-invalid={errors.firstName ? true : undefined}
-            aria-describedby={errors.firstName ? "firstName-error" : undefined}
-            {...register("firstName")}
-          />
+          <Input autoComplete="given-name" {...text("firstName")} />
         </Field>
 
         <Field
@@ -298,162 +189,33 @@ export function MaintenanceForm({
           required
           error={errors.lastName?.message}
         >
-          <Input
-            id="lastName"
-            autoComplete="family-name"
-            aria-invalid={errors.lastName ? true : undefined}
-            aria-describedby={errors.lastName ? "lastName-error" : undefined}
-            {...register("lastName")}
-          />
+          <Input autoComplete="family-name" {...text("lastName")} />
         </Field>
 
-        <Field
-          id="building"
-          label="Building"
-          required
-          error={errors.building?.message}
-        >
-          {hasUnitInventory ? (
-            <Controller
-              control={control}
-              name="building"
-              render={({ field }) => (
-                <Combobox
-                  items={buildingNames}
-                  value={field.value}
-                  onValueChange={(value, eventDetails) => {
-                    if (cancelIfEscapeKey(eventDetails)) return;
-                    field.onChange(value ?? "");
-                    setValue("apartment", "", { shouldValidate: true });
-                  }}
-                  onInputValueChange={(_value, eventDetails) => {
-                    if (cancelIfEscapeKey(eventDetails)) return;
-                    if (!isDirectComboboxTextEdit(eventDetails.reason)) return;
-                    field.onChange("");
-                    setValue("apartment", "", { shouldValidate: true });
-                  }}
-                  autoHighlight
-                >
-                  <ComboboxInput
-                    id="building"
-                    className="w-full"
-                    placeholder="Select your building"
-                    triggerLabel="Show building options"
-                    aria-invalid={errors.building ? true : undefined}
-                    aria-describedby={
-                      errors.building ? "building-error" : undefined
-                    }
-                  />
-                  <ComboboxContent>
-                    <ComboboxEmpty>No matching buildings.</ComboboxEmpty>
-                    <ComboboxList>
-                      {(building: string) => (
-                        <ComboboxItem key={building} value={building}>
-                          {building}
-                        </ComboboxItem>
-                      )}
-                    </ComboboxList>
-                  </ComboboxContent>
-                </Combobox>
-              )}
-            />
-          ) : (
-            <Input
-              id="building"
-              autoComplete="street-address"
-              aria-invalid={errors.building ? true : undefined}
-              aria-describedby={errors.building ? "building-error" : undefined}
-              {...register("building")}
-            />
-          )}
-        </Field>
+        <BuildingField
+          control={control}
+          register={register}
+          errors={errors}
+          hasUnitInventory={hasUnitInventory}
+          buildingNames={buildingNames}
+          setValue={setValue}
+        />
 
-        <Field
-          id="apartment"
-          label="Apartment number"
-          required
-          error={errors.apartment?.message}
-        >
-          {hasUnitInventory ? (
-            <Controller
-              control={control}
-              name="apartment"
-              render={({ field }) => (
-                <Combobox
-                  items={units}
-                  value={field.value}
-                  onValueChange={(value, eventDetails) => {
-                    if (cancelIfEscapeKey(eventDetails)) return;
-                    field.onChange(value ?? "");
-                  }}
-                  onInputValueChange={(_value, eventDetails) => {
-                    if (cancelIfEscapeKey(eventDetails)) return;
-                    if (!isDirectComboboxTextEdit(eventDetails.reason)) return;
-                    field.onChange("");
-                  }}
-                  disabled={!selectedBuilding}
-                  autoHighlight
-                >
-                  <ComboboxInput
-                    id="apartment"
-                    className="w-full"
-                    placeholder={
-                      selectedBuilding
-                        ? "Select your apartment"
-                        : "Select a building first"
-                    }
-                    triggerLabel="Show apartment options"
-                    aria-invalid={errors.apartment ? true : undefined}
-                    aria-describedby={
-                      errors.apartment ? "apartment-error" : undefined
-                    }
-                  />
-                  <ComboboxContent>
-                    <ComboboxEmpty>No matching apartments.</ComboboxEmpty>
-                    <ComboboxList>
-                      {(unit: string) => (
-                        <ComboboxItem key={unit} value={unit}>
-                          {unit}
-                        </ComboboxItem>
-                      )}
-                    </ComboboxList>
-                  </ComboboxContent>
-                </Combobox>
-              )}
-            />
-          ) : (
-            <Input
-              id="apartment"
-              autoComplete="address-line2"
-              aria-invalid={errors.apartment ? true : undefined}
-              aria-describedby={
-                errors.apartment ? "apartment-error" : undefined
-              }
-              {...register("apartment")}
-            />
-          )}
-        </Field>
+        <ApartmentField
+          control={control}
+          register={register}
+          errors={errors}
+          hasUnitInventory={hasUnitInventory}
+          units={units}
+          selectedBuilding={selectedBuilding}
+        />
 
         <Field id="phone" label="Phone" required error={errors.phone?.message}>
-          <Input
-            id="phone"
-            type="tel"
-            autoComplete="tel"
-            aria-invalid={errors.phone ? true : undefined}
-            aria-describedby={errors.phone ? "phone-error" : undefined}
-            {...register("phone")}
-          />
+          <Input type="tel" autoComplete="tel" {...text("phone")} />
         </Field>
 
         <Field id="email" label="Email" required error={errors.email?.message}>
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            aria-invalid={errors.email ? true : undefined}
-            aria-describedby={errors.email ? "email-error" : undefined}
-            {...register("email")}
-          />
+          <Input type="email" autoComplete="email" {...text("email")} />
         </Field>
       </div>
 
@@ -464,170 +226,35 @@ export function MaintenanceForm({
         error={errors.message?.message}
       >
         <Textarea
-          id="message"
           rows={5}
           placeholder="Describe the issue, where it is, and any access notes."
-          aria-invalid={errors.message ? true : undefined}
-          aria-describedby={errors.message ? "message-error" : undefined}
-          {...register("message")}
+          {...text("message")}
         />
       </Field>
 
-      {/* Permission to enter */}
-      <fieldset
-        className="flex flex-col gap-3"
-        aria-labelledby={permissionLegendId}
-        aria-invalid={errors.permissionToEnter ? true : undefined}
-      >
-        <legend id={permissionLegendId} className="text-sm font-medium">
-          Permission to enter
-          <span aria-hidden className="text-destructive"> *</span>
-        </legend>
-        <Controller
-          control={control}
-          name="permissionToEnter"
-          render={({ field }) => (
-            <RadioGroup
-              value={field.value ?? ""}
-              onValueChange={(value) => field.onChange(value as PermissionValue)}
-              aria-describedby={
-                errors.permissionToEnter ? "permission-error" : undefined
-              }
-            >
-              {PERMISSION_OPTIONS.map((option) => (
-                <Label
-                  key={option.value}
-                  className="flex cursor-pointer items-start gap-3 font-normal text-muted-foreground"
-                >
-                  <RadioGroupItem value={option.value} className="mt-0.5" />
-                  <span>{option.label}</span>
-                </Label>
-              ))}
-            </RadioGroup>
-          )}
-        />
-        {errors.permissionToEnter ? (
-          <p
-            id="permission-error"
-            role="alert"
-            className="text-sm text-destructive"
-          >
-            {errors.permissionToEnter.message}
-          </p>
-        ) : null}
-      </fieldset>
+      <PermissionFieldset
+        control={control}
+        error={errors.permissionToEnter?.message}
+      />
 
-      {/* Pet in residence */}
-      <fieldset
-        className="flex flex-col gap-3"
-        aria-labelledby={petLegendId}
-        aria-invalid={errors.petInResidence ? true : undefined}
-      >
-        <legend id={petLegendId} className="text-sm font-medium">
-          Pet in residence?
-          <span aria-hidden className="text-destructive"> *</span>
-        </legend>
-        <Controller
-          control={control}
-          name="petInResidence"
-          render={({ field }) => (
-            <RadioGroup
-              value={field.value ?? ""}
-              onValueChange={field.onChange}
-              className="flex flex-row gap-6"
-              aria-describedby={errors.petInResidence ? "pet-error" : undefined}
-            >
-              {PET_OPTIONS.map((option) => (
-                <Label
-                  key={option.value}
-                  className="flex cursor-pointer items-center gap-2 font-normal text-muted-foreground"
-                >
-                  <RadioGroupItem value={option.value} />
-                  <span>{option.label}</span>
-                </Label>
-              ))}
-            </RadioGroup>
-          )}
-        />
-        {errors.petInResidence ? (
-          <p id="pet-error" role="alert" className="text-sm text-destructive">
-            {errors.petInResidence.message}
-          </p>
-        ) : null}
-      </fieldset>
+      <PetFieldset control={control} error={errors.petInResidence?.message} />
 
-      {/* Photo upload */}
-      <div className="flex flex-col gap-2">
-        <span id={photosLabelId} className="text-sm font-medium">
-          Photos{" "}
-          <span className="font-normal text-muted-foreground">
-            (optional — JPG, PNG, or GIF, up to 5 MB each)
-          </span>
-        </span>
-        <label
-          className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-input bg-transparent px-4 py-6 text-sm text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
-          aria-describedby={photoError ? "photos-error" : undefined}
-        >
-          <Upload className="size-4" aria-hidden />
-          <span>Click to add photos</span>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept={ACCEPTED_IMAGE_ACCEPT}
-            multiple
-            className="sr-only"
-            aria-labelledby={photosLabelId}
-            onChange={(event) => addFiles(event.target.files)}
-          />
-        </label>
-
-        {photos.length > 0 ? (
-          <ul className="flex flex-col gap-2">
-            {photos.map((photo, index) => (
-              <li
-                key={`${photo.name}-${index}`}
-                className="flex items-center justify-between gap-3 rounded-md bg-secondary/50 px-3 py-2 text-sm ring-1 ring-foreground/10"
-              >
-                <span className="truncate">{photo.name}</span>
-                <span className="flex shrink-0 items-center gap-3">
-                  <span className="text-muted-foreground">
-                    {formatBytes(photo.size)}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => removePhoto(index)}
-                    className="grid size-6 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-foreground/10 hover:text-foreground"
-                    aria-label={`Remove ${photo.name}`}
-                  >
-                    <X className="size-4" aria-hidden />
-                  </button>
-                </span>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-
-        {photoError ? (
-          <p id="photos-error" role="alert" className="text-sm text-destructive">
-            {photoError}
-          </p>
-        ) : null}
-      </div>
+      <PhotoUploadField
+        photos={photos}
+        photoError={photoError}
+        fileInputRef={fileInputRef}
+        onAddFiles={addFiles}
+        onRemovePhoto={removePhoto}
+      />
 
       {/* CAPTCHA */}
       {TURNSTILE_SITE_KEY ? (
-        <div className="flex flex-col gap-2">
-          <TurnstileWidget
-            siteKey={TURNSTILE_SITE_KEY}
-            onVerify={handleVerify}
-            onExpire={handleExpire}
-          />
-          {captchaError ? (
-            <p role="alert" className="text-sm text-destructive">
-              {captchaError}
-            </p>
-          ) : null}
-        </div>
+        <CaptchaField
+          siteKey={TURNSTILE_SITE_KEY}
+          captchaError={captchaError}
+          onVerify={handleVerify}
+          onExpire={handleExpire}
+        />
       ) : null}
 
       <Button

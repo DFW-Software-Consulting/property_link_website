@@ -1,66 +1,43 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
-import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
   rentalApplicationSchema,
   type RentalApplicationInput,
 } from "@/lib/schemas/rental-application";
 import { siteConfig } from "@/lib/site-config";
+import { TURNSTILE_SITE_KEY } from "@/lib/turnstile";
+import { postFormRequest } from "@/lib/forms/post-form-request";
+import { createTextFieldProps } from "@/lib/forms/text-field-props";
+import { useTurnstileCaptcha } from "@/hooks/use-turnstile-captcha";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { TurnstileWidget } from "@/components/maintenance/turnstile-widget";
+import { Field } from "@/components/shared/form-field";
+import { CaptchaField } from "@/components/shared/captcha-field";
+import { HoneypotField } from "@/components/shared/honeypot-field";
 
-const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-
-type FieldProps = {
-  id: string;
-  label: string;
-  error?: string;
-  required?: boolean;
-  children: React.ReactNode;
-};
-
-function Field({ id, label, error, required, children }: FieldProps) {
-  return (
-    <div className="flex flex-col gap-2">
-      <Label htmlFor={id}>
-        {label}
-        {required ? <span aria-hidden className="text-destructive"> *</span> : null}
-      </Label>
-      {children}
-      {error ? (
-        <p id={`${id}-error`} role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
-      ) : null}
-    </div>
+async function submitRentalApplication(formData: FormData) {
+  return postFormRequest(
+    "/api/rental-application",
+    formData,
+    "Failed to submit your application",
   );
 }
 
-async function submitRentalApplication(formData: FormData) {
-  const res = await fetch("/api/rental-application", {
-    method: "POST",
-    body: formData,
-  });
-  if (!res.ok) {
-    const data = (await res.json().catch(() => null)) as
-      | { error?: string }
-      | null;
-    throw new Error(data?.error ?? "Failed to submit your application");
-  }
-  return res.json();
-}
-
 export function RentalApplicationForm() {
-  const [captchaToken, setCaptchaToken] = useState("");
-  const [captchaError, setCaptchaError] = useState<string | null>(null);
+  const {
+    captchaToken,
+    captchaError,
+    setCaptchaToken,
+    setCaptchaError,
+    handleVerify,
+    handleExpire,
+  } = useTurnstileCaptcha();
   const {
     register,
     handleSubmit,
@@ -80,12 +57,6 @@ export function RentalApplicationForm() {
       website: "",
     },
   });
-
-  const handleVerify = useCallback((token: string) => {
-    setCaptchaToken(token);
-    setCaptchaError(null);
-  }, []);
-  const handleExpire = useCallback(() => setCaptchaToken(""), []);
 
   const mutation = useMutation({
     mutationFn: submitRentalApplication,
@@ -122,22 +93,15 @@ export function RentalApplicationForm() {
     mutation.mutate(formData);
   }
 
+  const text = createTextFieldProps(register, errors);
+
   return (
     <form
       onSubmit={handleSubmit(onValid)}
       noValidate
       className="flex flex-col gap-6 rounded-xl bg-card p-6 ring-1 ring-foreground/10 sm:p-8"
     >
-      <div className="sr-only" aria-hidden>
-        <label htmlFor="website">Website</label>
-        <input
-          id="website"
-          type="text"
-          tabIndex={-1}
-          autoComplete="off"
-          {...register("website")}
-        />
-      </div>
+      <HoneypotField register={register} />
 
       <div className="grid gap-5 sm:grid-cols-2">
         <Field
@@ -146,24 +110,11 @@ export function RentalApplicationForm() {
           required
           error={errors.fullName?.message}
         >
-          <Input
-            id="fullName"
-            autoComplete="name"
-            aria-invalid={errors.fullName ? true : undefined}
-            aria-describedby={errors.fullName ? "fullName-error" : undefined}
-            {...register("fullName")}
-          />
+          <Input autoComplete="name" {...text("fullName")} />
         </Field>
 
         <Field id="email" label="Email" required error={errors.email?.message}>
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            aria-invalid={errors.email ? true : undefined}
-            aria-describedby={errors.email ? "email-error" : undefined}
-            {...register("email")}
-          />
+          <Input type="email" autoComplete="email" {...text("email")} />
         </Field>
 
         <Field
@@ -171,14 +122,7 @@ export function RentalApplicationForm() {
           label="Phone (optional)"
           error={errors.phone?.message}
         >
-          <Input
-            id="phone"
-            type="tel"
-            autoComplete="tel"
-            aria-invalid={errors.phone ? true : undefined}
-            aria-describedby={errors.phone ? "phone-error" : undefined}
-            {...register("phone")}
-          />
+          <Input type="tel" autoComplete="tel" {...text("phone")} />
         </Field>
 
         <Field
@@ -186,13 +130,7 @@ export function RentalApplicationForm() {
           label="Desired building (optional)"
           error={errors.building?.message}
         >
-          <Input
-            id="building"
-            autoComplete="off"
-            aria-invalid={errors.building ? true : undefined}
-            aria-describedby={errors.building ? "building-error" : undefined}
-            {...register("building")}
-          />
+          <Input autoComplete="off" {...text("building")} />
         </Field>
 
         <Field
@@ -200,13 +138,7 @@ export function RentalApplicationForm() {
           label="Desired move-in (optional)"
           error={errors.moveInDate?.message}
         >
-          <Input
-            id="moveInDate"
-            type="month"
-            aria-invalid={errors.moveInDate ? true : undefined}
-            aria-describedby={errors.moveInDate ? "moveInDate-error" : undefined}
-            {...register("moveInDate")}
-          />
+          <Input type="month" {...text("moveInDate")} />
         </Field>
 
         <Field
@@ -215,41 +147,29 @@ export function RentalApplicationForm() {
           error={errors.occupants?.message}
         >
           <Input
-            id="occupants"
             type="number"
             min={1}
             max={20}
-            aria-invalid={errors.occupants ? true : undefined}
-            aria-describedby={errors.occupants ? "occupants-error" : undefined}
-            {...register("occupants", { valueAsNumber: true })}
+            {...text("occupants", { valueAsNumber: true })}
           />
         </Field>
       </div>
 
       <Field id="message" label="Message (optional)" error={errors.message?.message}>
         <Textarea
-          id="message"
           rows={5}
           placeholder="Tell us anything helpful about your housing needs."
-          aria-invalid={errors.message ? true : undefined}
-          aria-describedby={errors.message ? "message-error" : undefined}
-          {...register("message")}
+          {...text("message")}
         />
       </Field>
 
       {TURNSTILE_SITE_KEY ? (
-        <div className="flex flex-col gap-2">
-          <TurnstileWidget
-            siteKey={TURNSTILE_SITE_KEY}
-            onVerify={handleVerify}
-            onExpire={handleExpire}
-          />
-          {captchaError ? (
-            <p role="alert" className="text-sm text-destructive">
-              {captchaError}
-            </p>
-          ) : null}
-        </div>
+        <CaptchaField
+          siteKey={TURNSTILE_SITE_KEY}
+          captchaError={captchaError}
+          onVerify={handleVerify}
+          onExpire={handleExpire}
+        />
       ) : null}
 
       <Button
