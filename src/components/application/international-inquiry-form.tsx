@@ -200,7 +200,7 @@ export function InternationalInquiryForm() {
     mutationFn: submitInternationalApplication,
     onSuccess: () => {
       toast.success(
-        "Thanks — our leasing team will be in touch within one business day.",
+        "Thanks, our leasing team will be in touch shortly.",
       );
       reset();
       setCaptchaToken("");

@@ -29,7 +29,7 @@ export const amenities: Amenity[] = [
   {
     icon: Snowflake,
     label: "Air conditioning",
-    description: "Comfortable in every season.",
+    description: "In place in every unit; runs on electricity, billed separately.",
   },
   {
     icon: BedDouble,
@@ -43,7 +43,7 @@ export const amenities: Amenity[] = [
   },
   {
     icon: PawPrint,
-    label: "Pet-friendly",
-    description: "Bring the whole household — pets are welcome.",
+    label: "Pets welcome",
+    description: "Subject to building policy and application approval.",
   },
 ];

@@ -11,7 +11,7 @@ export const properties: Property[] = [
   {
     slug: "138-bowery",
     name: "138 Bowery",
-    neighborhood: "Little Italy",
+    neighborhood: "Bowery",
     image: "/images/properties/138-bowery.jpg",
     blurb:
       "A historic Bowery streetscape steps from the Grand St subway, with SoHo and NoHo at your door.",
@@ -43,7 +43,7 @@ export const properties: Property[] = [
   {
     slug: "626-10th-ave",
     name: "626 10th Avenue",
-    neighborhood: "Midtown West",
+    neighborhood: "Hell's Kitchen",
     image: "/images/properties/626-10th-ave.jpg",
     blurb:
       "A six-story mid-rise in the heart of the Theater District and Restaurant Row.",
