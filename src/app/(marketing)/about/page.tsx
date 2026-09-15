@@ -6,7 +6,7 @@ import { Container } from "@/components/layout/container";
 import { VideoHero } from "@/components/marketing/video-hero";
 import { TrustBar } from "@/components/marketing/trust-bar";
 import { LogoStrip } from "@/components/marketing/logo-strip";
-import { TestimonialCarousel } from "@/components/marketing/testimonial-carousel";
+import { TestimonialMarquee } from "@/components/marketing/testimonial-marquee";
 import { CtaBand } from "@/components/marketing/cta-band";
 import { Badge } from "@/components/ui/badge";
 import { testimonials } from "@/lib/data/testimonials";
@@ -134,7 +134,7 @@ export default function AboutPage() {
             align="center"
             className="mx-auto"
           />
-          <TestimonialCarousel testimonials={testimonials} />
+          <TestimonialMarquee testimonials={testimonials} />
         </Container>
       </Section>
 

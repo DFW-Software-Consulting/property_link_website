@@ -8,7 +8,7 @@ import { Container } from "@/components/layout/container";
 import { FeatureCard } from "@/components/marketing/feature-card";
 import { AmenityItem } from "@/components/marketing/amenity-item";
 import { HomepageBuildings } from "@/components/marketing/homepage-buildings";
-import { TestimonialCarousel } from "@/components/marketing/testimonial-carousel";
+import { TestimonialMarquee } from "@/components/marketing/testimonial-marquee";
 import { LogoStrip } from "@/components/marketing/logo-strip";
 import { CtaBand } from "@/components/marketing/cta-band";
 import { amenities } from "@/lib/data/amenities";
@@ -93,7 +93,7 @@ export default function HomePage() {
             align="center"
             className="mx-auto"
           />
-          <TestimonialCarousel testimonials={testimonials} />
+          <TestimonialMarquee testimonials={testimonials} />
         </Container>
       </Section>
 

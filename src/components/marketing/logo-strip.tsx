@@ -1,3 +1,4 @@
+import { Marquee } from "@/components/marketing/marquee";
 import { clients } from "@/lib/data/clients";
 
 export function LogoStrip({ heading }: { heading?: string }) {
@@ -8,16 +9,20 @@ export function LogoStrip({ heading }: { heading?: string }) {
           {heading}
         </p>
       ) : null}
-      <ul className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-        {clients.map((client) => (
-          <li
-            key={client}
-            className="font-heading text-lg font-medium text-foreground/55"
-          >
-            {client}
-          </li>
-        ))}
-      </ul>
+      <Marquee
+        label="Client companies"
+        minItemsPerHalf={10}
+        secondsPerItem={3.5}
+        itemClassName="pr-12"
+        items={clients.map((client) => ({
+          key: client,
+          node: (
+            <span className="font-heading text-lg font-medium whitespace-nowrap text-foreground/55">
+              {client}
+            </span>
+          ),
+        }))}
+      />
     </div>
   );
 }

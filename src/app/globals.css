@@ -51,6 +51,21 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+@theme inline {
+  /* Continuous horizontal scroll for the reviews and client rows (see Marquee).
+     The track holds two identical halves, so moving by -50% loops seamlessly.
+     `inline` so each row's --marquee-duration resolves on that row, not :root. */
+  --animate-marquee: marquee var(--marquee-duration, 40s) linear infinite;
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}
+
 :root {
   /* "Corporate Trust" palette (client-approved): white pages, cool gray
      surfaces/lines, deep blue-gray ink, PropertyLink teal as the single accent. */
