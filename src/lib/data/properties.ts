@@ -38,7 +38,7 @@ export const properties: Property[] = [
     neighborhood: "Hell's Kitchen",
     image: "/images/properties/433-west-53.jpg",
     blurb:
-      "A newer elevator building with floor-to-ceiling windows and abundant natural light.",
+      "A newer elevator building with floor-to-ceiling windows.",
   },
   {
     slug: "626-10th-ave",
@@ -70,6 +70,6 @@ export const properties: Property[] = [
     neighborhood: "Hell's Kitchen",
     image: "/images/properties/407-west-51.jpg",
     blurb:
-      "Close to Broadway theaters and Restaurant Row in vibrant Hell's Kitchen.",
+      "Close to Broadway theaters and Restaurant Row in Hell's Kitchen.",
   },
 ];

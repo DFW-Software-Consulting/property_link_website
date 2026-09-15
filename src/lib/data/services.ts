@@ -17,7 +17,7 @@ export const services: Service[] = [
     title: "Short-Term Furnished Stays",
     tagline: "Fully furnished homes for stays of 30 days or more.",
     description:
-      "A cost-effective, far more comfortable alternative to an extended hotel stay. Move in with nothing but a suitcase — everything else is already here.",
+      "A furnished apartment for a month or longer, as an alternative to an extended hotel stay.",
     features: [
       "Move-in ready with furniture, linens, and a full kitchen",
       "Utilities and Wi-Fi are set up for you",
@@ -32,26 +32,26 @@ export const services: Service[] = [
     tagline:
       "Settle into a 12-month lease in a building owned and managed by one team.",
     description:
-      "Make Manhattan home with the convenience of an owner-operated building and a management team that actually answers the phone.",
+      "A 12-month lease with the building's owner as your landlord and manager.",
     features: [
       "Furnished and unfurnished options",
-      "Responsive, accountable management — we send our team when you need us",
+      "Maintenance requests handled by our own team",
       "Pets welcome, subject to building policy",
-      "Prime, transit-rich neighborhoods",
+      "Buildings in five Manhattan neighborhoods",
     ],
   },
   {
     id: "corporate",
     icon: Building2,
     title: "Corporate & Relocation Housing",
-    tagline: "Turnkey housing for teams, productions, and relocations.",
+    tagline: "Furnished housing for teams, productions, and relocations.",
     description:
-      "Trusted by leading companies and productions to house their people in Manhattan, with a single point of contact and terms built for business.",
+      "Housing for companies and productions bringing staff to Manhattan.",
     features: [
       "One point of contact for HR and relocation teams",
       "Flexible lease terms and consolidated billing",
       "Multiple furnished units across Manhattan",
-      "Proven with corporate and entertainment clients",
+      "Experience with corporate and entertainment clients",
     ],
   },
 ];
