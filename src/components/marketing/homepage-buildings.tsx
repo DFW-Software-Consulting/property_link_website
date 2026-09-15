@@ -23,7 +23,7 @@ export async function HomepageBuildings() {
         <SectionHeading
           eyebrow="Our buildings"
           title="Buildings we own across Manhattan"
-          description="Every PropertyLink home sits in a building we own and manage, in some of Manhattan's most connected neighborhoods."
+          description="Every PropertyLink apartment is in a building we own and manage."
         />
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {useCms

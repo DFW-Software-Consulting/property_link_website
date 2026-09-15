@@ -24,15 +24,15 @@ export const metadata: Metadata = {
 const valueProps = [
   {
     icon: ShieldCheck,
-    title: "We own every building",
+    title: "We own our buildings",
     description:
-      "No middlemen, no runaround. The team you reach is the team that owns and manages your building.",
+      "The team you reach is the team that owns and manages your building.",
   },
   {
     icon: Sparkles,
-    title: "Truly move-in ready",
+    title: "Furnished apartments",
     description:
-      "Furnished and stocked with Wi-Fi, linens, and a full kitchen. Arrive with a suitcase.",
+      "Furniture, linens, and a full kitchen, with Wi-Fi set up before you move in.",
   },
   {
     icon: CalendarClock,
@@ -58,7 +58,7 @@ export default function HomePage() {
           <SectionHeading
             eyebrow="Why PropertyLink"
             title="A different kind of Manhattan landlord"
-            description="Because we own and operate our buildings, we know every unit firsthand — and we're accountable for your experience from your first inquiry to your last day."
+            description="We own and operate our buildings, so we know every unit firsthand."
           />
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {valueProps.map((feature) => (
@@ -72,8 +72,8 @@ export default function HomePage() {
         <Container className="flex flex-col gap-10">
           <SectionHeading
             eyebrow="What's included"
-            title="Everything's already here"
-            description="Each furnished home comes ready for daily life — no setup, no waiting."
+            title="In every furnished unit"
+            description="What's in place when you move in. Electricity is billed separately."
           />
           <div className="grid gap-x-8 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
             {amenities.map((amenity) => (
@@ -89,7 +89,7 @@ export default function HomePage() {
         <Container className="flex flex-col gap-10">
           <SectionHeading
             eyebrow="Resident reviews"
-            title="Trusted by New Yorkers and the companies that move them"
+            title="What residents say"
             align="center"
             className="mx-auto"
           />
