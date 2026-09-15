@@ -18,7 +18,7 @@ import {
 export const revalidate = 60;
 
 const PAGE_DESCRIPTION =
-  "Move-in-ready furnished stays of 30 days or more across Manhattan, with Wi-Fi, utilities, linens, and full kitchens included. Every home is in a building PropertyLink owns and manages.";
+  "Move-in-ready furnished stays of 30 days or more across Manhattan, with linens and a full kitchen, and Wi-Fi and utilities set up for you. Every home is in a building PropertyLink owns and manages.";
 
 export const metadata: Metadata = {
   title: "Short-Term Stays",

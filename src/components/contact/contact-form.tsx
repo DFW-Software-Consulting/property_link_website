@@ -100,7 +100,7 @@ export function ContactForm({
   const mutation = useMutation({
     mutationFn: submitInquiry,
     onSuccess: () => {
-      toast.success("Thanks — we'll be in touch within one business day.");
+      toast.success("Thanks, we'll be in touch shortly.");
       reset();
     },
     onError: () => {

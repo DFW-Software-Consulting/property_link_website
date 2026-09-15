@@ -19,7 +19,7 @@ import {
 export const revalidate = 60;
 
 const PAGE_DESCRIPTION =
-  "Browse PropertyLink's furnished residences across Manhattan — 12-month leases in a building we own and manage, from Little Italy to the Upper East Side.";
+  "Browse PropertyLink's residences across Manhattan: 12-month leases and furnished stays of 30 days or more, in buildings we own and manage.";
 
 export const metadata: Metadata = {
   title: "Residences",
