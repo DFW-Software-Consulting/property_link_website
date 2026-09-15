@@ -19,12 +19,12 @@ export const amenities: Amenity[] = [
   {
     icon: Wifi,
     label: "High-speed Wi-Fi",
-    description: "Connected and work-ready from the moment you arrive.",
+    description: "Set up before you move in.",
   },
   {
     icon: Flame,
     label: "Heat & hot water",
-    description: "In place in every unit — electricity billed separately.",
+    description: "In place in every unit; electricity is billed separately.",
   },
   {
     icon: Snowflake,
@@ -34,7 +34,7 @@ export const amenities: Amenity[] = [
   {
     icon: BedDouble,
     label: "Fresh linens",
-    description: "Beds made and towels stocked for move-in day.",
+    description: "Bed linens and towels provided.",
   },
   {
     icon: ChefHat,
