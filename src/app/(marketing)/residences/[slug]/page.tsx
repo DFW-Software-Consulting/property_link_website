@@ -45,7 +45,7 @@ export async function generateMetadata({
   // `description` is now sanitized rich-text HTML; flatten it for meta/OG tags.
   const description =
     descriptionToPlainText(building.description) ||
-    `12-month furnished leases at ${building.name}${where} — a building PropertyLink owns and manages.`;
+    `Furnished stays of 30 days or more and 12-month leases at ${building.name}${where}, in a building PropertyLink owns and manages.`;
   const path = `/residences/${building.slug}`;
   const ogImages = building.hero
     ? [
@@ -246,7 +246,7 @@ export default async function BuildingPage({
           <Container className="flex flex-col gap-6">
             <SectionHeading
               eyebrow="Amenities"
-              title="What's included"
+              title="In the building"
               description="Amenities available across this building's homes."
             />
             <ul className="flex flex-wrap gap-2">
@@ -273,7 +273,7 @@ export default async function BuildingPage({
 
       <CtaBand
         title={`Interested in ${building.name}?`}
-        description="Tell us your dates and what you're looking for — we'll confirm availability and respond within one business day."
+        description="Tell us your dates and what you're looking for, and we'll confirm availability."
         ctaHref={inquiryHref}
       />
     </>

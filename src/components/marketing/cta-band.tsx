@@ -22,7 +22,7 @@ export async function CtaBand({ title, description, ctaHref = "/contact" }: CtaB
         </h2>
         <p className="max-w-2xl text-primary-foreground/80">
           {description ??
-            "Tell us your dates and what you're looking for — we respond within one business day."}
+            "Tell us your dates and what you're looking for, and we'll be in touch."}
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button

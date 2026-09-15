@@ -18,7 +18,7 @@ import { services } from "@/lib/data/services";
 export const metadata: Metadata = {
   title: "Furnished Housing Services",
   description:
-    "Furnished stays of 30 days or more, 12-month leases, and corporate relocation housing across Manhattan — all in PropertyLink-owned buildings with Wi-Fi, utilities, linens, and full kitchens included.",
+    "Furnished stays of 30 days or more, 12-month leases, and corporate relocation housing across Manhattan, all in buildings PropertyLink owns and manages.",
 };
 
 const steps = [
@@ -51,17 +51,17 @@ const faqs = [
   {
     question: "What's included in a furnished unit?",
     answer:
-      "Wi-Fi, heat and hot water, air conditioning, fresh linens, and a full kitchen — all set up for you, with electricity billed to your own account. Arrive with a suitcase; everything else is already there.",
+      "Wi-Fi, heat and hot water, air conditioning, fresh linens, and a full kitchen, all set up for you. In most buildings heat and air conditioning run on electricity, which is billed to your own account and not included in the price. Arrive with a suitcase; everything else is already there.",
   },
   {
     question: "Are pets allowed?",
     answer:
-      "Yes, pets are welcome. Some restrictions may apply.",
+      "Yes, our buildings are pet friendly. Pets must be approved as part of your application, and some buildings have restrictions such as weight limits.",
   },
   {
     question: "Which neighborhoods do you cover?",
     answer:
-      "Little Italy, Hell's Kitchen, Midtown West, the Upper East Side, and Bowery — all in buildings we own and manage.",
+      "Little Italy, Hell's Kitchen, the Upper East Side, the Upper West Side, and Bowery, all in buildings we own and manage.",
   },
   {
     question: "How do I apply?",
@@ -75,8 +75,7 @@ const faqs = [
           application
         </Link>{" "}
         online, or reach out through our contact form or call 888-622-0772. We
-        welcome both U.S. and international residents and respond within one
-        business day.
+        welcome both U.S. and international residents.
       </>
     ),
   },
@@ -173,7 +172,7 @@ export default function ServicesPage() {
 
       <CtaBand
         title="Found a stay that fits?"
-        description="Tell us your dates and what you're looking for — we'll match you to the right home and respond within one business day."
+        description="Tell us your dates and what you're looking for, and we'll be in touch."
       />
     </>
   );

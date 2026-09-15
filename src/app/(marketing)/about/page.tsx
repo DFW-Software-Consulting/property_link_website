@@ -35,12 +35,12 @@ const neighborhoods = [
       "Steps from the Theater District, Restaurant Row, and Midtown.",
   },
   {
-    name: "Midtown West",
-    description: "Central to Broadway, major transit, and the West Side.",
-  },
-  {
     name: "Upper East Side",
     description: "Classic blocks beside Central Park and Museum Mile.",
+  },
+  {
+    name: "Upper West Side",
+    description: "Residential blocks between Central Park and Riverside Park.",
   },
   {
     name: "Bowery",
@@ -99,7 +99,7 @@ export default function AboutPage() {
             title="Neighborhoods we serve"
             description="Our buildings sit in five of Manhattan's most connected and characterful neighborhoods."
           />
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {neighborhoods.map((neighborhood) => (
               <div
                 key={neighborhood.name}

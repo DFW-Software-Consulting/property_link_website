@@ -24,10 +24,10 @@ export function Hero() {
           Furnished Manhattan apartments, in buildings we own.
         </h1>
         <p className="max-w-xl text-lg text-primary-foreground/85">
-          Move-in-ready homes across Little Italy, Hell&apos;s Kitchen, Midtown
-          West, the Upper East Side, and Bowery — from 30-day furnished stays
-          to 12-month leases, managed end-to-end by the people who own the
-          building.
+          Move-in-ready homes across Little Italy, Hell&apos;s Kitchen, the
+          Upper East Side, the Upper West Side, and Bowery, from 30-day
+          furnished stays to 12-month leases, managed end-to-end by the people
+          who own the building.
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button
