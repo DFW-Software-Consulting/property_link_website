@@ -34,11 +34,11 @@ const steps = [
   {
     title: "Apply",
     description:
-      "A straightforward application — U.S. and international residents welcome.",
+      "Apply online. U.S. and international residents are welcome.",
   },
   {
     title: "Move in",
-    description: "Pick up the keys and settle into a move-in-ready home.",
+    description: "Pick up your keys and move in.",
   },
 ];
 
@@ -51,7 +51,7 @@ const faqs = [
   {
     question: "What's included in a furnished unit?",
     answer:
-      "Wi-Fi, heat and hot water, air conditioning, fresh linens, and a full kitchen, all set up for you. In most buildings heat and air conditioning run on electricity, which is billed to your own account and not included in the price. Arrive with a suitcase; everything else is already there.",
+      "Wi-Fi, heat and hot water, air conditioning, fresh linens, and a full kitchen, all set up for you. In most buildings heat and air conditioning run on electricity, which is billed to your own account and not included in the price.",
   },
   {
     question: "Are pets allowed?",
@@ -89,8 +89,8 @@ export default function ServicesPage() {
           <SectionHeading
             as="h1"
             eyebrow="Our services"
-            title="Furnished housing for every kind of stay"
-            description="Whether you're in town for a month or settling in for years, PropertyLink offers a move-in-ready home in a building we own and manage."
+            title="Furnished stays and 12-month leases"
+            description="PropertyLink rents apartments in buildings we own and manage, for stays of 30 days or more or on 12-month leases."
           />
         </Container>
       </Section>
@@ -109,8 +109,8 @@ export default function ServicesPage() {
         <Container className="flex flex-col gap-10">
           <SectionHeading
             eyebrow="What's included"
-            title="Every home comes ready for daily life"
-            description="No setup, no waiting — these come standard in every furnished unit."
+            title="In every furnished unit"
+            description="What's in place when you move in. Electricity is billed separately."
           />
           <div className="grid gap-x-8 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
             {amenities.map((amenity) => (

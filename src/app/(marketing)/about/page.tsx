@@ -14,7 +14,7 @@ import { testimonials } from "@/lib/data/testimonials";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Founded in 2015, PropertyLink Management NYC is a furnished-housing provider that owns every building it rents. Learn about our owner-operated approach and the companies that trust us.",
+    "PropertyLink Management NYC owns and manages every building it rents in Manhattan, with furnished stays of 30 days or more and 12-month leases.",
 };
 
 const differentiators = [
@@ -54,8 +54,8 @@ export default function AboutPage() {
     <>
       <VideoHero
         eyebrow="About PropertyLink NYC"
-        title="New York City's premier furnished housing provider"
-        description="Since 2015, we've taken a different approach to renting in Manhattan: we only offer apartments in buildings we own. That means one team is responsible for your home — and your experience — from start to finish."
+        title="Owner-operated apartments in Manhattan"
+        description="We only rent apartments in buildings we own, so the same team handles your lease, your building, and your maintenance requests."
       />
 
       <TrustBar />
@@ -68,15 +68,13 @@ export default function AboutPage() {
               title="Why owning our buildings matters"
             />
             <p className="text-muted-foreground">
-              PropertyLink Management was founded on a simple idea: the best way
-              to give residents a great experience is to own the buildings we
-              rent. There&apos;s no third-party landlord and no leasing middleman —
-              just one team that knows every unit and stands behind it.
+              PropertyLink Management owns the buildings it rents. There&apos;s no
+              third-party landlord or leasing middleman: the same team handles
+              leasing, management, and maintenance.
             </p>
             <p className="text-muted-foreground">
-              That ownership lets us keep our homes genuinely move-in ready, keep
-              our prices fair, and respond quickly when something comes up. It&apos;s
-              why residents and corporate partners alike keep coming back.
+              We offer furnished stays of 30 days or more and 12-month leases, for
+              individual residents and for companies housing their staff.
             </p>
           </div>
           <ul className="flex flex-col gap-4 rounded-xl bg-card p-7 ring-1 ring-foreground/10">
@@ -97,7 +95,7 @@ export default function AboutPage() {
           <SectionHeading
             eyebrow="Where we are"
             title="Neighborhoods we serve"
-            description="Our buildings sit in five of Manhattan's most connected and characterful neighborhoods."
+            description="Our buildings are in five Manhattan neighborhoods."
           />
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {neighborhoods.map((neighborhood) => (
@@ -120,9 +118,9 @@ export default function AboutPage() {
       <Section>
         <Container className="flex flex-col gap-10">
           <SectionHeading
-            eyebrow="Trusted partners"
-            title="Companies and productions trust us with their people"
-            description="We provide corporate and relocation housing for leading companies and entertainment productions working in New York."
+            eyebrow="Corporate housing"
+            title="Companies and productions we've housed"
+            description="We provide corporate and relocation housing for companies and entertainment productions working in New York."
           />
           <LogoStrip />
         </Container>
