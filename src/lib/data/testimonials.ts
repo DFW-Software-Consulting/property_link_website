@@ -2,6 +2,8 @@ export type Testimonial = {
   quote: string;
   author: string;
   source: string;
+  /** Whole-star rating (1-5) from the review source; stars render only when set. */
+  rating?: number;
 };
 
 /**

@@ -6,7 +6,7 @@ import { Container } from "@/components/layout/container";
 import { VideoHero } from "@/components/marketing/video-hero";
 import { TrustBar } from "@/components/marketing/trust-bar";
 import { LogoStrip } from "@/components/marketing/logo-strip";
-import { TestimonialCard } from "@/components/marketing/testimonial-card";
+import { TestimonialCarousel } from "@/components/marketing/testimonial-carousel";
 import { CtaBand } from "@/components/marketing/cta-band";
 import { Badge } from "@/components/ui/badge";
 import { testimonials } from "@/lib/data/testimonials";
@@ -136,14 +136,7 @@ export default function AboutPage() {
             align="center"
             className="mx-auto"
           />
-          <div className="grid gap-6 md:grid-cols-3">
-            {testimonials.map((testimonial) => (
-              <TestimonialCard
-                key={testimonial.quote}
-                testimonial={testimonial}
-              />
-            ))}
-          </div>
+          <TestimonialCarousel testimonials={testimonials} />
         </Container>
       </Section>
 
