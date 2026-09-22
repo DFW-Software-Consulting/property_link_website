@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { Container } from "@/components/layout/container";
 import { Logo } from "@/components/layout/logo";
+import { EqualHousingOpportunity } from "@/components/layout/equal-housing-opportunity";
 import {
   FacebookIcon,
   InstagramIcon,
@@ -109,9 +110,12 @@ export function SiteFooter({ contact }: { contact: SiteContactInfo }) {
           <p>
             © {year} {siteConfig.name}. All rights reserved.
           </p>
-          <Link href="/contact" className="transition-colors hover:text-foreground">
-            Privacy Policy
-          </Link>
+          <div className="flex items-center gap-6">
+            <EqualHousingOpportunity className="text-foreground/70" />
+            <Link href="/contact" className="transition-colors hover:text-foreground">
+              Privacy Policy
+            </Link>
+          </div>
         </div>
       </Container>
     </footer>
