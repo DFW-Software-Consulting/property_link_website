@@ -3,6 +3,7 @@ import { render } from "@react-email/render";
 import {
   contactInquirySchema,
   inquiryTypeLabels,
+  unitSizeLabels,
 } from "@/lib/schemas/contact";
 import { isEmailConfigured, sendContactNotification } from "@/lib/email/mailer";
 import { ContactNotificationEmail } from "@/emails/contact-notification";
@@ -77,7 +78,9 @@ export async function POST(request: Request) {
       inquiryType={data.inquiryType}
       building={building}
       company={data.company?.trim() || undefined}
+      unitSize={data.unitSize ? unitSizeLabels[data.unitSize] : undefined}
       moveInDate={data.moveInDate?.trim() || undefined}
+      moveOutDate={data.moveOutDate?.trim() || undefined}
       message={data.message.trim()}
     />
   );
