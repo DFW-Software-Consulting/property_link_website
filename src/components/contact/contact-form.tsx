@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -9,9 +10,13 @@ import {
   contactInquirySchema,
   INQUIRY_TYPES,
   inquiryTypeLabels,
+  UNIT_SIZES,
+  unitSizeLabels,
   type ContactInquiryInput,
   type InquiryType,
+  type UnitSize,
 } from "@/lib/schemas/contact";
+import { minMoveOutDate } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -79,6 +84,7 @@ export function ContactForm({
     handleSubmit,
     control,
     reset,
+    watch,
     formState: { errors },
   } = useForm<ContactInquiryInput>({
     resolver: zodResolver(contactInquirySchema),
@@ -87,15 +93,29 @@ export function ContactForm({
       email: "",
       phone: "",
       inquiryType: initialInquiryType ?? "general",
+      unitSize: "",
       building: building ?? "",
       buildingSlug: buildingSlug ?? "",
       company: "",
       moveInDate: "",
+      moveOutDate: "",
       message: building ? `I'm interested in ${building}.` : "",
       consent: false,
       website: "",
     },
   });
+
+  const inquiryType = watch("inquiryType");
+  const moveInDate = watch("moveInDate");
+  const sizeOptional = inquiryType === "general";
+  const moveOutRequired = inquiryType === "short_term" || inquiryType === "corporate";
+
+  // Set the picker's earliest date after mount: it depends on today's date,
+  // which the server and the browser can disagree about mid-render.
+  const [earliestMoveOut, setEarliestMoveOut] = useState<string | undefined>();
+  useEffect(() => {
+    setEarliestMoveOut(minMoveOutDate(moveInDate?.trim() || undefined));
+  }, [moveInDate]);
 
   const mutation = useMutation({
     mutationFn: submitInquiry,
@@ -178,6 +198,7 @@ export function ContactForm({
             name="inquiryType"
             render={({ field }) => (
               <Select
+                items={inquiryTypeLabels}
                 value={field.value}
                 onValueChange={(value) => field.onChange(value as InquiryType)}
               >
@@ -199,11 +220,37 @@ export function ContactForm({
 
       <div className="grid gap-5 sm:grid-cols-2">
         <Field
-          id="moveInDate"
-          label="Desired move-in (optional)"
-          error={errors.moveInDate?.message}
+          id="unitSize"
+          label={`Apartment size${sizeOptional ? " (optional)" : ""}`}
+          error={errors.unitSize?.message}
         >
-          <Input id="moveInDate" type="date" {...register("moveInDate")} />
+          <Controller
+            control={control}
+            name="unitSize"
+            render={({ field }) => (
+              <Select
+                items={unitSizeLabels}
+                value={field.value ?? ""}
+                onValueChange={(value) => field.onChange(value as UnitSize)}
+              >
+                <SelectTrigger
+                  id="unitSize"
+                  className="w-full"
+                  aria-invalid={errors.unitSize ? true : undefined}
+                  aria-describedby={errors.unitSize ? "unitSize-error" : undefined}
+                >
+                  <SelectValue placeholder="Select a size" />
+                </SelectTrigger>
+                <SelectContent>
+                  {UNIT_SIZES.map((size) => (
+                    <SelectItem key={size} value={size}>
+                      {unitSizeLabels[size]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
         </Field>
 
         <Field
@@ -216,6 +263,34 @@ export function ContactForm({
             autoComplete="organization"
             {...register("company")}
           />
+        </Field>
+      </div>
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <Field
+          id="moveInDate"
+          label="Desired move-in (optional)"
+          error={errors.moveInDate?.message}
+        >
+          <Input id="moveInDate" type="date" {...register("moveInDate")} />
+        </Field>
+
+        <Field
+          id="moveOutDate"
+          label={`Desired move-out${moveOutRequired ? "" : " (optional)"}`}
+          error={errors.moveOutDate?.message}
+        >
+          <Input
+            id="moveOutDate"
+            type="date"
+            min={earliestMoveOut}
+            aria-invalid={errors.moveOutDate ? true : undefined}
+            aria-describedby={errors.moveOutDate ? "moveOutDate-error" : undefined}
+            {...register("moveOutDate")}
+          />
+          <p className="text-sm text-muted-foreground">
+            Stays run 30 days or longer.
+          </p>
         </Field>
       </div>
 

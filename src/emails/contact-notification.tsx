@@ -18,7 +18,9 @@ export type ContactNotificationProps = {
   inquiryType: InquiryType;
   building?: string;
   company?: string;
+  unitSize?: string;
   moveInDate?: string;
+  moveOutDate?: string;
   message: string;
 };
 
@@ -40,7 +42,9 @@ export function ContactNotificationEmail({
   inquiryType,
   building,
   company,
+  unitSize,
   moveInDate,
+  moveOutDate,
   message,
 }: ContactNotificationProps) {
   return (
@@ -78,7 +82,11 @@ export function ContactNotificationEmail({
             <Row label="Phone" value={<Link href={`tel:${phone}`}>{phone}</Link>} />
           ) : null}
           {company ? <Row label="Company" value={company} /> : null}
+          {unitSize ? <Row label="Apartment size" value={unitSize} /> : null}
           {moveInDate ? <Row label="Desired move-in" value={moveInDate} /> : null}
+          {moveOutDate ? (
+            <Row label="Desired move-out" value={moveOutDate} />
+          ) : null}
           <Hr style={{ borderColor: "#e5e7eb" }} />
           <Text
             style={{ fontWeight: 700, margin: "12px 0 4px", color: "#1f2533" }}
