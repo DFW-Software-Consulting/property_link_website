@@ -15,14 +15,21 @@ vi.mock("@react-email/render", () => ({ render: mocks.render }));
 
 import { POST } from "./route";
 
+/** Comfortably past the 30-day move-out cutoff, whenever the suite runs. */
+const moveOutDate = new Date(Date.now() + 60 * 86_400_000)
+  .toISOString()
+  .slice(0, 10);
+
 const validBody = {
   name: "  Morgan Lee  ",
   email: "morgan@example.com",
   phone: "  +1 212 555 0110  ",
   inquiryType: "long_term",
+  unitSize: "two_bedroom",
   building: "  100 Main Street  ",
   company: "  Example Co  ",
   moveInDate: "  September 2026  ",
+  moveOutDate,
   message: "  I would like details about available apartments.  ",
   consent: true,
   website: "",
@@ -65,7 +72,9 @@ describe("POST /api/contact", () => {
       phone: "+1 212 555 0110",
       building: "100 Main Street",
       company: "Example Co",
+      unitSize: "Two bedroom",
       moveInDate: "September 2026",
+      moveOutDate,
     });
     expect(mocks.sendContactNotification).toHaveBeenCalledWith(
       expect.objectContaining({
