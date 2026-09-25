@@ -9,7 +9,10 @@ import { LogoStrip } from "@/components/marketing/logo-strip";
 import { TestimonialMarquee } from "@/components/marketing/testimonial-marquee";
 import { CtaBand } from "@/components/marketing/cta-band";
 import { Badge } from "@/components/ui/badge";
+import { listCmsReviews, listCmsTrustedCompanies } from "@/lib/cms/client";
+import { clients } from "@/lib/data/clients";
 import { testimonials } from "@/lib/data/testimonials";
+import { companyNamesFromCms, testimonialsFromCms } from "@/lib/social-proof";
 
 export const metadata: Metadata = {
   title: "About",
@@ -49,7 +52,11 @@ const neighborhoods = [
   },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const [reviews, companies] = await Promise.all([
+    listCmsReviews(),
+    listCmsTrustedCompanies(),
+  ]);
   return (
     <>
       <VideoHero
@@ -122,7 +129,7 @@ export default function AboutPage() {
             title="Companies and productions we've housed"
             description="We provide corporate and relocation housing for companies and entertainment productions working in New York."
           />
-          <LogoStrip />
+          <LogoStrip companies={companyNamesFromCms(companies, clients)} />
         </Container>
       </Section>
 
@@ -134,7 +141,9 @@ export default function AboutPage() {
             align="center"
             className="mx-auto"
           />
-          <TestimonialMarquee testimonials={testimonials} />
+          <TestimonialMarquee
+            testimonials={testimonialsFromCms(reviews, testimonials)}
+          />
         </Container>
       </Section>
 

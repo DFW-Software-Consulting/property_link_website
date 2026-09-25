@@ -4,6 +4,8 @@ import {
   getCmsBuilding,
   getPublicMaintenanceUnitInventory,
   listCmsBuildings,
+  listCmsReviews,
+  listCmsTrustedCompanies,
 } from "../client";
 
 const buildingSummary = {
@@ -111,5 +113,51 @@ describe("getPublicMaintenanceUnitInventory", () => {
     mockFetch(async () => new Response("error", { status: 500 }));
 
     await expect(getPublicMaintenanceUnitInventory()).resolves.toBeNull();
+  });
+});
+
+describe("listCmsTrustedCompanies", () => {
+  it("returns the company names from the CMS", async () => {
+    mockFetch(async () => okJson({ data: [{ name: "DO&CO" }, { name: "Fastly" }] }));
+    expect(await listCmsTrustedCompanies()).toEqual([
+      { name: "DO&CO" },
+      { name: "Fastly" },
+    ]);
+  });
+
+  it("returns [] when the CMS has not deployed the endpoint yet", async () => {
+    mockFetch(async () => new Response("not found", { status: 404 }));
+    expect(await listCmsTrustedCompanies()).toEqual([]);
+  });
+
+  it("returns [] when a name is empty", async () => {
+    mockFetch(async () => okJson({ data: [{ name: "" }] }));
+    expect(await listCmsTrustedCompanies()).toEqual([]);
+  });
+});
+
+describe("listCmsReviews", () => {
+  const review = {
+    quote: "I had a great stay.",
+    author: "Jonathan S.",
+    source: "yelp",
+    rating: 5,
+  };
+
+  it("returns the published reviews", async () => {
+    mockFetch(async () => okJson({ data: [review] }));
+    expect(await listCmsReviews()).toEqual([review]);
+  });
+
+  it("returns [] when a rating is out of range", async () => {
+    mockFetch(async () => okJson({ data: [{ ...review, rating: 6 }] }));
+    expect(await listCmsReviews()).toEqual([]);
+  });
+
+  it("returns [] on a network error", async () => {
+    mockFetch(async () => {
+      throw new Error("network down");
+    });
+    expect(await listCmsReviews()).toEqual([]);
   });
 });

@@ -76,12 +76,34 @@ const maintenanceUnitInventorySchema = z.object({
   buildings: z.array(maintenanceUnitBuildingSchema),
 });
 
+/** A company in the "Trusted by" strip. The CMS returns them A to Z. */
+const cmsTrustedCompanySchema = z.object({
+  name: z.string().min(1),
+});
+
+/**
+ * A published resident review, quoted word for word. The CMS only returns
+ * reviews staff have switched to published, so the client vets each one.
+ */
+const cmsReviewSchema = z.object({
+  quote: z.string().min(1),
+  author: z.string().min(1),
+  source: z.string(),
+  rating: z.number().int().min(1).max(5),
+});
+
 /** Envelope wrappers — the API returns `{ data: ... }`. */
 export const cmsBuildingsResponseSchema = z.object({
   data: z.array(cmsBuildingSummarySchema),
 });
 export const cmsBuildingResponseSchema = z.object({ data: cmsBuildingSchema });
 export const cmsCompanyInfoResponseSchema = z.object({ data: cmsCompanyInfoSchema });
+export const cmsTrustedCompaniesResponseSchema = z.object({
+  data: z.array(cmsTrustedCompanySchema),
+});
+export const cmsReviewsResponseSchema = z.object({
+  data: z.array(cmsReviewSchema),
+});
 export const maintenanceUnitInventoryResponseSchema = z.object({
   data: maintenanceUnitInventorySchema,
 });
@@ -91,6 +113,8 @@ export type CmsUnitSummary = z.infer<typeof cmsUnitSummarySchema>;
 export type CmsBuildingSummary = z.infer<typeof cmsBuildingSummarySchema>;
 export type CmsBuilding = z.infer<typeof cmsBuildingSchema>;
 export type CmsCompanyInfo = z.infer<typeof cmsCompanyInfoSchema>;
+export type CmsTrustedCompany = z.infer<typeof cmsTrustedCompanySchema>;
+export type CmsReview = z.infer<typeof cmsReviewSchema>;
 export type MaintenanceUnitBuilding = z.infer<
   typeof maintenanceUnitBuildingSchema
 >;

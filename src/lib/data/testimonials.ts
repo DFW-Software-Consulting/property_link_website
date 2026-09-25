@@ -8,8 +8,8 @@ export type Testimonial = {
 
 /**
  * Drawn from PropertyLink's public reviews (Google / Yelp / Birdeye).
- * NOTE: wording is paraphrased and attribution is generic — exact quotes and
- * reviewer names are pending client verification before publishing.
+ * NOTE: wording is paraphrased and attribution is generic. These only show
+ * until staff publish real reviews from the Emmut CMS (see social-proof.ts).
  */
 export const testimonials: Testimonial[] = [
   {

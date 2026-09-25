@@ -1,7 +1,12 @@
 import { Marquee } from "@/components/marketing/marquee";
-import { clients } from "@/lib/data/clients";
 
-export function LogoStrip({ heading }: { heading?: string }) {
+export function LogoStrip({
+  companies,
+  heading,
+}: {
+  companies: string[];
+  heading?: string;
+}) {
   return (
     <div className="flex flex-col items-center gap-6">
       {heading ? (
@@ -14,7 +19,7 @@ export function LogoStrip({ heading }: { heading?: string }) {
         minItemsPerHalf={10}
         secondsPerItem={3.5}
         itemClassName="pr-12"
-        items={clients.map((client) => ({
+        items={companies.map((client) => ({
           key: client,
           node: (
             <span className="font-heading text-lg font-medium whitespace-nowrap text-foreground/55">

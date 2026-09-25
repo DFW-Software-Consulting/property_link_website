@@ -20,12 +20,16 @@ import {
   cmsBuildingResponseSchema,
   cmsBuildingsResponseSchema,
   cmsCompanyInfoResponseSchema,
+  cmsReviewsResponseSchema,
+  cmsTrustedCompaniesResponseSchema,
   maintenanceUnitInventoryResponseSchema,
 } from "./schema";
 import type {
   CmsBuilding,
   CmsBuildingSummary,
   CmsCompanyInfo,
+  CmsReview,
+  CmsTrustedCompany,
   MaintenanceUnitInventory,
 } from "./types";
 
@@ -119,6 +123,38 @@ export async function getCmsCompanyInfo(): Promise<CmsCompanyInfo | null> {
       operation: "getCompanyInfo",
     });
     return null;
+  }
+}
+
+/**
+ * "Trusted by" companies managed in the CMS, A to Z. Returns an empty list
+ * (never throws) so callers can fall back to the built-in names.
+ */
+export async function listCmsTrustedCompanies(): Promise<CmsTrustedCompany[]> {
+  try {
+    const json = await fetchCmsJson("/api/public/cms/trusted-companies");
+    return cmsTrustedCompaniesResponseSchema.parse(json).data;
+  } catch (error) {
+    cmsLogger.error("failed to list trusted companies", error, {
+      operation: "listTrustedCompanies",
+    });
+    return [];
+  }
+}
+
+/**
+ * Published resident reviews managed in the CMS. Returns an empty list
+ * (never throws) so callers can fall back to the built-in reviews.
+ */
+export async function listCmsReviews(): Promise<CmsReview[]> {
+  try {
+    const json = await fetchCmsJson("/api/public/cms/reviews");
+    return cmsReviewsResponseSchema.parse(json).data;
+  } catch (error) {
+    cmsLogger.error("failed to list reviews", error, {
+      operation: "listReviews",
+    });
+    return [];
   }
 }
 

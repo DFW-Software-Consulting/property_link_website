@@ -13,6 +13,8 @@ export type {
   CmsBuildingSummary,
   CmsBuilding,
   CmsCompanyInfo,
+  CmsTrustedCompany,
+  CmsReview,
   MaintenanceUnitBuilding,
   MaintenanceUnitInventory,
 } from "./schema";
