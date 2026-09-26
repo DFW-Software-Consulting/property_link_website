@@ -12,7 +12,10 @@ import { TestimonialMarquee } from "@/components/marketing/testimonial-marquee";
 import { LogoStrip } from "@/components/marketing/logo-strip";
 import { CtaBand } from "@/components/marketing/cta-band";
 import { amenities } from "@/lib/data/amenities";
+import { listCmsReviews, listCmsTrustedCompanies } from "@/lib/cms/client";
+import { clients } from "@/lib/data/clients";
 import { testimonials } from "@/lib/data/testimonials";
+import { companyNamesFromCms, testimonialsFromCms } from "@/lib/social-proof";
 
 export const revalidate = 60;
 
@@ -47,7 +50,11 @@ const valueProps = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [reviews, companies] = await Promise.all([
+    listCmsReviews(),
+    listCmsTrustedCompanies(),
+  ]);
   return (
     <>
       <Hero />
@@ -93,13 +100,18 @@ export default function HomePage() {
             align="center"
             className="mx-auto"
           />
-          <TestimonialMarquee testimonials={testimonials} />
+          <TestimonialMarquee
+            testimonials={testimonialsFromCms(reviews, testimonials)}
+          />
         </Container>
       </Section>
 
       <Section spacing="sm">
         <Container>
-          <LogoStrip heading="Trusted by teams at" />
+          <LogoStrip
+            heading="Trusted by teams at"
+            companies={companyNamesFromCms(companies, clients)}
+          />
         </Container>
       </Section>
 

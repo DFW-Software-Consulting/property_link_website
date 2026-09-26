@@ -1,7 +1,8 @@
 /**
  * Corporate and production clients named on the legacy About page. Rendered as
  * a text-based "trusted by" strip — display as logos only once usage rights and
- * brand assets are confirmed with the client.
+ * brand assets are confirmed with the client. Shown only until staff add
+ * names in the Emmut CMS (see social-proof.ts).
  */
 export const clients: string[] = [
   "Fast Retailing",
