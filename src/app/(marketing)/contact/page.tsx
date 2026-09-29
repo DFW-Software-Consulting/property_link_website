@@ -8,7 +8,13 @@ import {
   FacebookIcon,
   InstagramIcon,
 } from "@/components/icons/social-icons";
-import { INQUIRY_TYPES, type InquiryType } from "@/lib/schemas/contact";
+import {
+  INQUIRY_TYPES,
+  UNIT_SIZES,
+  type InquiryType,
+  type UnitSize,
+} from "@/lib/schemas/contact";
+import { parseIsoDate } from "@/lib/dates";
 import { getSiteContactInfo } from "@/lib/contact-info";
 import { siteConfig } from "@/lib/site-config";
 
@@ -35,6 +41,17 @@ export default async function ContactPage({
     requestedType && (INQUIRY_TYPES as readonly string[]).includes(requestedType)
       ? (requestedType as InquiryType)
       : undefined;
+  // Set by "Request this apartment" on the availability search.
+  const requestedSize =
+    typeof params.unitSize === "string" ? params.unitSize : undefined;
+  const initialUnitSize: UnitSize | undefined =
+    requestedSize && (UNIT_SIZES as readonly string[]).includes(requestedSize)
+      ? (requestedSize as UnitSize)
+      : undefined;
+  const initialMoveInDate =
+    typeof params.moveInDate === "string" && parseIsoDate(params.moveInDate)
+      ? params.moveInDate
+      : undefined;
 
   return (
     <Section>
@@ -50,6 +67,8 @@ export default async function ContactPage({
             building={building}
             buildingSlug={buildingSlug}
             initialInquiryType={initialInquiryType}
+            initialUnitSize={initialUnitSize}
+            initialMoveInDate={initialMoveInDate}
           />
 
           <aside className="flex flex-col gap-6">

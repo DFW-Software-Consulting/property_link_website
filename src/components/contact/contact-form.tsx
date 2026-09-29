@@ -72,12 +72,17 @@ type ContactFormProps = {
   building?: string;
   buildingSlug?: string;
   initialInquiryType?: InquiryType;
+  /** Prefill when opened from an availability search result. */
+  initialUnitSize?: UnitSize;
+  initialMoveInDate?: string;
 };
 
 export function ContactForm({
   building,
   buildingSlug,
   initialInquiryType,
+  initialUnitSize,
+  initialMoveInDate,
 }: ContactFormProps) {
   const {
     register,
@@ -93,11 +98,11 @@ export function ContactForm({
       email: "",
       phone: "",
       inquiryType: initialInquiryType ?? "general",
-      unitSize: "",
+      unitSize: initialUnitSize ?? "",
       building: building ?? "",
       buildingSlug: buildingSlug ?? "",
       company: "",
-      moveInDate: "",
+      moveInDate: initialMoveInDate ?? "",
       moveOutDate: "",
       message: building ? `I'm interested in ${building}.` : "",
       consent: false,
