@@ -8,6 +8,7 @@ export const revalidate = 60;
 const STATIC_ROUTES: { path: string; priority: number }[] = [
   { path: "/", priority: 1 },
   { path: "/residences", priority: 0.9 },
+  { path: "/availability", priority: 0.8 },
   { path: "/short-term-stays", priority: 0.9 },
   { path: "/services", priority: 0.8 },
   { path: "/about", priority: 0.6 },

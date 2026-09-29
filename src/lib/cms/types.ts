@@ -15,6 +15,7 @@ export type {
   CmsCompanyInfo,
   CmsTrustedCompany,
   CmsReview,
+  CmsAvailabilityResult,
   MaintenanceUnitBuilding,
   MaintenanceUnitInventory,
 } from "./schema";

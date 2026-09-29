@@ -57,7 +57,7 @@ export function SiteHeader({ contact }: { contact: SiteContactInfo }) {
             {contact.phone.display}
           </a>
           <Button
-            render={<Link href="/contact" />}
+            render={<Link href="/availability" />}
             nativeButton={false}
             variant="brand"
             size="xl"
@@ -115,7 +115,7 @@ export function SiteHeader({ contact }: { contact: SiteContactInfo }) {
                 {contact.phone.display}
               </a>
               <Button
-                render={<Link href="/contact" />}
+                render={<Link href="/availability" />}
                 nativeButton={false}
                 variant="brand"
                 size="xl"
