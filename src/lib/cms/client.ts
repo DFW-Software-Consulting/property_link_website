@@ -17,7 +17,6 @@ import { env } from "@/lib/env";
 
 import { cmsLogger } from "./logger";
 import {
-  cmsAvailabilityResponseSchema,
   cmsBuildingResponseSchema,
   cmsBuildingsResponseSchema,
   cmsCompanyInfoResponseSchema,
@@ -26,7 +25,6 @@ import {
   maintenanceUnitInventoryResponseSchema,
 } from "./schema";
 import type {
-  CmsAvailabilityResult,
   CmsBuilding,
   CmsBuildingSummary,
   CmsCompanyInfo,
@@ -201,37 +199,5 @@ export async function checkCmsHealth(): Promise<{
       ok: false,
       error: error instanceof Error ? error.message : "unknown error",
     };
-  }
-}
-
-/** Filters for the Check Availability search; every one is optional. */
-export type AvailabilitySearch = {
-  building?: string;
-  neighborhood?: string;
-  bedrooms?: number;
-};
-
-/**
- * Open apartments from the live Check Availability search. Returns `null`
- * (never throws) when the CMS is unreachable or the shape is invalid, so the
- * page can tell "nothing open" apart from "couldn't check".
- */
-export async function searchCmsAvailability(
-  search: AvailabilitySearch,
-): Promise<CmsAvailabilityResult[] | null> {
-  const params = new URLSearchParams();
-  if (search.building) params.set("building", search.building);
-  if (search.neighborhood) params.set("neighborhood", search.neighborhood);
-  if (search.bedrooms !== undefined) params.set("bedrooms", String(search.bedrooms));
-  const query = params.size > 0 ? `?${params}` : "";
-
-  try {
-    const json = await fetchCmsJson(`/api/public/cms/availability${query}`);
-    return cmsAvailabilityResponseSchema.parse(json).data;
-  } catch (error) {
-    cmsLogger.error("failed to search availability", error, {
-      operation: "searchAvailability",
-    });
-    return null;
   }
 }

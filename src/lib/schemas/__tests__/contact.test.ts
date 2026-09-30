@@ -4,6 +4,7 @@ import {
   contactInquirySchema,
   INQUIRY_TYPES,
   inquiryTypeLabels,
+  MAX_GUESTS,
   UNIT_SIZES,
   unitSizeLabels,
 } from "../contact";
@@ -19,6 +20,8 @@ const validInquiry = {
   phone: "+1 212 555 0100",
   inquiryType: "long_term",
   unitSize: "two_bedroom",
+  guests: "2",
+  neighborhood: "Little Italy",
   building: "Maple Court",
   buildingSlug: "maple-court",
   company: "Example Co.",
@@ -224,4 +227,41 @@ describe("move-out date", () => {
       ).toBe(true);
     },
   );
+});
+
+describe("number of guests", () => {
+  function guestIssue(overrides: Record<string, unknown>) {
+    const result = contactInquirySchema.safeParse({ ...validInquiry, ...overrides });
+    return result.success
+      ? undefined
+      : result.error.issues.find((issue) => issue.path[0] === "guests")?.message;
+  }
+
+  it("requires a guest count for stay inquiries", () => {
+    expect(guestIssue({ guests: "" })).toBe("Please enter the number of guests");
+    expect(guestIssue({ guests: undefined })).toBe("Please enter the number of guests");
+  });
+
+  it("leaves guests optional for a general question", () => {
+    expect(guestIssue({ inquiryType: "general", unitSize: "", guests: "" })).toBeUndefined();
+  });
+
+  it("accepts whole numbers from 1 to the maximum", () => {
+    expect(guestIssue({ guests: "1" })).toBeUndefined();
+    expect(guestIssue({ guests: ` ${MAX_GUESTS} ` })).toBeUndefined();
+  });
+
+  it.each(["0", "-1", "2.5", "abc", String(MAX_GUESTS + 1)])("rejects %s guests", (guests) => {
+    expect(guestIssue({ guests })).toBe(`Please enter a number of guests from 1 to ${MAX_GUESTS}`);
+  });
+});
+
+describe("location", () => {
+  it("is optional and trimmed", () => {
+    const blank = contactInquirySchema.safeParse({ ...validInquiry, neighborhood: "" });
+    expect(blank.success).toBe(true);
+
+    const padded = contactInquirySchema.safeParse({ ...validInquiry, neighborhood: "  Bowery  " });
+    expect(padded.success && padded.data.neighborhood).toBe("Bowery");
+  });
 });

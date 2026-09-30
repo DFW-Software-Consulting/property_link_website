@@ -31,7 +31,7 @@ export function Hero() {
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button
-            render={<Link href="/availability" />}
+            render={<Link href="/contact" />}
             nativeButton={false}
             variant="brand"
             size="xl"

@@ -5,10 +5,11 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowRight, Building2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import {
   contactInquirySchema,
   INQUIRY_TYPES,
+  MAX_GUESTS,
   inquiryTypeLabels,
   UNIT_SIZES,
   unitSizeLabels,
@@ -17,6 +18,7 @@ import {
   type UnitSize,
 } from "@/lib/schemas/contact";
 import { minMoveOutDate } from "@/lib/dates";
+import { buildingsInNeighborhood, type BuildingOption } from "@/lib/contact-location";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -72,24 +74,26 @@ type ContactFormProps = {
   building?: string;
   buildingSlug?: string;
   initialInquiryType?: InquiryType;
-  /** Prefill when opened from an availability search result. */
-  initialUnitSize?: UnitSize;
-  initialMoveInDate?: string;
+  /** Published buildings for the Location and Building pickers. */
+  buildingOptions: BuildingOption[];
+  neighborhoods: string[];
 };
 
 export function ContactForm({
   building,
   buildingSlug,
   initialInquiryType,
-  initialUnitSize,
-  initialMoveInDate,
+  buildingOptions,
+  neighborhoods,
 }: ContactFormProps) {
+  const prefilled = buildingOptions.find((b) => b.slug === buildingSlug);
   const {
     register,
     handleSubmit,
     control,
     reset,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<ContactInquiryInput>({
     resolver: zodResolver(contactInquirySchema),
@@ -98,11 +102,13 @@ export function ContactForm({
       email: "",
       phone: "",
       inquiryType: initialInquiryType ?? "general",
-      unitSize: initialUnitSize ?? "",
+      unitSize: "",
+      neighborhood: prefilled?.neighborhood ?? "",
       building: building ?? "",
       buildingSlug: buildingSlug ?? "",
+      guests: "",
       company: "",
-      moveInDate: initialMoveInDate ?? "",
+      moveInDate: "",
       moveOutDate: "",
       message: building ? `I'm interested in ${building}.` : "",
       consent: false,
@@ -112,6 +118,8 @@ export function ContactForm({
 
   const inquiryType = watch("inquiryType");
   const moveInDate = watch("moveInDate");
+  const neighborhood = watch("neighborhood");
+  const visibleBuildings = buildingsInNeighborhood(buildingOptions, neighborhood);
   const sizeOptional = inquiryType === "general";
   const moveOutRequired = inquiryType === "short_term" || inquiryType === "corporate";
 
@@ -153,19 +161,8 @@ export function ContactForm({
         />
       </div>
 
-      {/* Property context carried from a building page. */}
+      {/* The chosen building's display name, set alongside its slug. */}
       <input type="hidden" {...register("building")} />
-      <input type="hidden" {...register("buildingSlug")} />
-
-      {building ? (
-        <div className="flex items-center gap-2 rounded-lg bg-secondary/60 px-3 py-2.5 text-sm ring-1 ring-foreground/10">
-          <Building2 aria-hidden className="size-4 shrink-0 text-brand-strong" />
-          <span>
-            Inquiring about{" "}
-            <strong className="font-medium text-foreground">{building}</strong>
-          </span>
-        </div>
-      ) : null}
 
       <div className="grid gap-5 sm:grid-cols-2">
         <Field id="name" label="Name" error={errors.name?.message}>
@@ -223,6 +220,76 @@ export function ContactForm({
         </Field>
       </div>
 
+      {buildingOptions.length > 0 ? (
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field id="neighborhood" label="Location" error={errors.neighborhood?.message}>
+            <Controller
+              control={control}
+              name="neighborhood"
+              render={({ field }) => (
+                <Select
+                  items={Object.fromEntries(neighborhoods.map((n) => [n, n]))}
+                  value={field.value || null}
+                  onValueChange={(value) => {
+                    const next = (value as string | null) ?? "";
+                    field.onChange(next);
+                    // Drop a building that isn't in the newly chosen location.
+                    const slug = watch("buildingSlug");
+                    if (slug && !buildingsInNeighborhood(buildingOptions, next).some((b) => b.slug === slug)) {
+                      setValue("buildingSlug", "");
+                      setValue("building", "");
+                    }
+                  }}
+                >
+                  <SelectTrigger id="neighborhood" className="w-full">
+                    <SelectValue placeholder="No preference" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={null}>No preference</SelectItem>
+                    {neighborhoods.map((name) => (
+                      <SelectItem key={name} value={name}>
+                        {name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </Field>
+
+          <Field id="buildingSlug" label="Building" error={errors.buildingSlug?.message}>
+            <Controller
+              control={control}
+              name="buildingSlug"
+              render={({ field }) => (
+                <Select
+                  items={Object.fromEntries(buildingOptions.map((b) => [b.slug, b.name]))}
+                  value={field.value || null}
+                  onValueChange={(value) => {
+                    const chosen = buildingOptions.find((b) => b.slug === value);
+                    field.onChange(chosen?.slug ?? "");
+                    setValue("building", chosen?.name ?? "");
+                    if (chosen?.neighborhood) setValue("neighborhood", chosen.neighborhood);
+                  }}
+                >
+                  <SelectTrigger id="buildingSlug" className="w-full">
+                    <SelectValue placeholder="No preference" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={null}>No preference</SelectItem>
+                    {visibleBuildings.map((b) => (
+                      <SelectItem key={b.slug} value={b.slug}>
+                        {b.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </Field>
+        </div>
+      ) : null}
+
       <div className="grid gap-5 sm:grid-cols-2">
         <Field
           id="unitSize"
@@ -259,14 +326,20 @@ export function ContactForm({
         </Field>
 
         <Field
-          id="company"
-          label="Company (optional)"
-          error={errors.company?.message}
+          id="guests"
+          label={`Number of guests${sizeOptional ? " (optional)" : ""}`}
+          error={errors.guests?.message}
         >
           <Input
-            id="company"
-            autoComplete="organization"
-            {...register("company")}
+            id="guests"
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={MAX_GUESTS}
+            step={1}
+            aria-invalid={errors.guests ? true : undefined}
+            aria-describedby={errors.guests ? "guests-error" : undefined}
+            {...register("guests")}
           />
         </Field>
       </div>
@@ -296,6 +369,20 @@ export function ContactForm({
           <p className="text-sm text-muted-foreground">
             Stays run 30 days or longer.
           </p>
+        </Field>
+      </div>
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <Field
+          id="company"
+          label="Company (optional)"
+          error={errors.company?.message}
+        >
+          <Input
+            id="company"
+            autoComplete="organization"
+            {...register("company")}
+          />
         </Field>
       </div>
 

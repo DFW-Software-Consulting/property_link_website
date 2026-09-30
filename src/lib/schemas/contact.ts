@@ -41,6 +41,9 @@ export const unitSizeLabels: Record<UnitSize, string> = {
   four_bedroom: "Four bedroom",
 };
 
+/** Largest party the form accepts; bigger groups say so in the message. */
+export const MAX_GUESTS = 20;
+
 /** Inquiries about a specific stay, where we need the move-out date. */
 const STAY_INQUIRY_TYPES: InquiryType[] = ["short_term", "corporate"];
 
@@ -51,9 +54,13 @@ export const contactInquirySchema = z
     phone: z.string().trim().max(30).optional().or(z.literal("")),
     inquiryType: z.enum(INQUIRY_TYPES),
     unitSize: z.enum(UNIT_SIZES).or(z.literal("")).optional(),
-    // Optional property context, set when the form is opened from a building page.
+    // Where they want to live. Neighborhood and building are optional ("no
+    // preference"); a building page pre-selects its building.
+    neighborhood: z.string().trim().max(120).optional().or(z.literal("")),
     building: z.string().trim().max(160).optional().or(z.literal("")),
     buildingSlug: z.string().trim().max(120).optional().or(z.literal("")),
+    // Kept as the typed text so a blank box stays blank; checked below.
+    guests: z.string().trim().max(3).optional().or(z.literal("")),
     company: z.string().trim().max(120).optional().or(z.literal("")),
     moveInDate: z.string().max(40).optional().or(z.literal("")),
     moveOutDate: z.string().max(40).optional().or(z.literal("")),
@@ -74,6 +81,24 @@ export const contactInquirySchema = z
         code: "custom",
         path: ["unitSize"],
         message: "Please choose an apartment size",
+      });
+    }
+
+    const guests = value.guests?.trim() ?? "";
+    if (guests) {
+      const count = Number(guests);
+      if (!Number.isInteger(count) || count < 1 || count > MAX_GUESTS) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["guests"],
+          message: `Please enter a number of guests from 1 to ${MAX_GUESTS}`,
+        });
+      }
+    } else if (value.inquiryType !== "general") {
+      ctx.addIssue({
+        code: "custom",
+        path: ["guests"],
+        message: "Please enter the number of guests",
       });
     }
 

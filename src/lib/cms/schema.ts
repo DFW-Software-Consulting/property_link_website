@@ -92,21 +92,6 @@ const cmsReviewSchema = z.object({
   rating: z.number().int().min(1).max(5),
 });
 
-/**
- * One Check Availability result: a kind of apartment in a published building
- * that is open now or soon. Anonymous by design (no unit id or count).
- */
-const cmsAvailabilityResultSchema = z.object({
-  building: z.object({
-    slug: z.string(),
-    name: z.string(),
-    neighborhood: z.string().nullable(),
-  }),
-  bedrooms: z.number().int().min(0),
-  bathrooms: z.number().nullable(),
-  availableFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-});
-
 /** Envelope wrappers — the API returns `{ data: ... }`. */
 export const cmsBuildingsResponseSchema = z.object({
   data: z.array(cmsBuildingSummarySchema),
@@ -119,9 +104,6 @@ export const cmsTrustedCompaniesResponseSchema = z.object({
 export const cmsReviewsResponseSchema = z.object({
   data: z.array(cmsReviewSchema),
 });
-export const cmsAvailabilityResponseSchema = z.object({
-  data: z.array(cmsAvailabilityResultSchema),
-});
 export const maintenanceUnitInventoryResponseSchema = z.object({
   data: maintenanceUnitInventorySchema,
 });
@@ -133,7 +115,6 @@ export type CmsBuilding = z.infer<typeof cmsBuildingSchema>;
 export type CmsCompanyInfo = z.infer<typeof cmsCompanyInfoSchema>;
 export type CmsTrustedCompany = z.infer<typeof cmsTrustedCompanySchema>;
 export type CmsReview = z.infer<typeof cmsReviewSchema>;
-export type CmsAvailabilityResult = z.infer<typeof cmsAvailabilityResultSchema>;
 export type MaintenanceUnitBuilding = z.infer<
   typeof maintenanceUnitBuildingSchema
 >;

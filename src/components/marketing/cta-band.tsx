@@ -7,11 +7,11 @@ import { getSiteContactInfo } from "@/lib/contact-info";
 type CtaBandProps = {
   title?: string;
   description?: string;
-  /** Destination for the primary CTA button (defaults to the availability search). */
+  /** Destination for the primary CTA button (defaults to the contact page). */
   ctaHref?: string;
 };
 
-export async function CtaBand({ title, description, ctaHref = "/availability" }: CtaBandProps) {
+export async function CtaBand({ title, description, ctaHref = "/contact" }: CtaBandProps) {
   const contact = await getSiteContactInfo();
 
   return (
