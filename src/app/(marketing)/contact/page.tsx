@@ -8,14 +8,10 @@ import {
   FacebookIcon,
   InstagramIcon,
 } from "@/components/icons/social-icons";
-import {
-  INQUIRY_TYPES,
-  UNIT_SIZES,
-  type InquiryType,
-  type UnitSize,
-} from "@/lib/schemas/contact";
-import { parseIsoDate } from "@/lib/dates";
+import { INQUIRY_TYPES, type InquiryType } from "@/lib/schemas/contact";
 import { getSiteContactInfo } from "@/lib/contact-info";
+import { listCmsBuildings } from "@/lib/cms/client";
+import { uniqueNeighborhoods } from "@/lib/cms/filter-buildings";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
@@ -30,7 +26,11 @@ export default async function ContactPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const params = await searchParams;
-  const contact = await getSiteContactInfo();
+  // listCmsBuildings never throws; with the CMS down the pickers just hide.
+  const [contact, buildings] = await Promise.all([
+    getSiteContactInfo(),
+    listCmsBuildings(),
+  ]);
   const building =
     typeof params.building === "string" ? params.building : undefined;
   const buildingSlug =
@@ -40,17 +40,6 @@ export default async function ContactPage({
   const initialInquiryType: InquiryType | undefined =
     requestedType && (INQUIRY_TYPES as readonly string[]).includes(requestedType)
       ? (requestedType as InquiryType)
-      : undefined;
-  // Set by "Request this apartment" on the availability search.
-  const requestedSize =
-    typeof params.unitSize === "string" ? params.unitSize : undefined;
-  const initialUnitSize: UnitSize | undefined =
-    requestedSize && (UNIT_SIZES as readonly string[]).includes(requestedSize)
-      ? (requestedSize as UnitSize)
-      : undefined;
-  const initialMoveInDate =
-    typeof params.moveInDate === "string" && parseIsoDate(params.moveInDate)
-      ? params.moveInDate
       : undefined;
 
   return (
@@ -67,8 +56,12 @@ export default async function ContactPage({
             building={building}
             buildingSlug={buildingSlug}
             initialInquiryType={initialInquiryType}
-            initialUnitSize={initialUnitSize}
-            initialMoveInDate={initialMoveInDate}
+            buildingOptions={buildings.map(({ slug, name, neighborhood }) => ({
+              slug,
+              name,
+              neighborhood: neighborhood?.trim() || null,
+            }))}
+            neighborhoods={uniqueNeighborhoods(buildings)}
           />
 
           <aside className="flex flex-col gap-6">

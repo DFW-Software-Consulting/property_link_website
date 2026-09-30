@@ -26,6 +26,8 @@ const validBody = {
   phone: "  +1 212 555 0110  ",
   inquiryType: "long_term",
   unitSize: "two_bedroom",
+  guests: " 3 ",
+  neighborhood: "  Bowery  ",
   building: "  100 Main Street  ",
   company: "  Example Co  ",
   moveInDate: "  September 2026  ",
@@ -73,6 +75,8 @@ describe("POST /api/contact", () => {
       building: "100 Main Street",
       company: "Example Co",
       unitSize: "Two bedroom",
+      guests: "3",
+      neighborhood: "Bowery",
       moveInDate: "September 2026",
       moveOutDate,
     });

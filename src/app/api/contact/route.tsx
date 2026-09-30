@@ -76,9 +76,11 @@ export async function POST(request: Request) {
       email={email}
       phone={data.phone?.trim() || undefined}
       inquiryType={data.inquiryType}
+      neighborhood={data.neighborhood?.trim() || undefined}
       building={building}
       company={data.company?.trim() || undefined}
       unitSize={data.unitSize ? unitSizeLabels[data.unitSize] : undefined}
+      guests={data.guests?.trim() || undefined}
       moveInDate={data.moveInDate?.trim() || undefined}
       moveOutDate={data.moveOutDate?.trim() || undefined}
       message={data.message.trim()}

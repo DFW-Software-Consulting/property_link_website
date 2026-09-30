@@ -16,9 +16,11 @@ export type ContactNotificationProps = {
   email: string;
   phone?: string;
   inquiryType: InquiryType;
+  neighborhood?: string;
   building?: string;
   company?: string;
   unitSize?: string;
+  guests?: string;
   moveInDate?: string;
   moveOutDate?: string;
   message: string;
@@ -40,9 +42,11 @@ export function ContactNotificationEmail({
   email,
   phone,
   inquiryType,
+  neighborhood,
   building,
   company,
   unitSize,
+  guests,
   moveInDate,
   moveOutDate,
   message,
@@ -75,6 +79,7 @@ export function ContactNotificationEmail({
             {inquiryTypeLabels[inquiryType]}
           </Text>
           <Hr style={{ borderColor: "#e5e7eb" }} />
+          {neighborhood ? <Row label="Location" value={neighborhood} /> : null}
           {building ? <Row label="Property" value={building} /> : null}
           <Row label="Name" value={name} />
           <Row label="Email" value={<Link href={`mailto:${email}`}>{email}</Link>} />
@@ -83,6 +88,7 @@ export function ContactNotificationEmail({
           ) : null}
           {company ? <Row label="Company" value={company} /> : null}
           {unitSize ? <Row label="Apartment size" value={unitSize} /> : null}
+          {guests ? <Row label="Guests" value={guests} /> : null}
           {moveInDate ? <Row label="Desired move-in" value={moveInDate} /> : null}
           {moveOutDate ? (
             <Row label="Desired move-out" value={moveOutDate} />
