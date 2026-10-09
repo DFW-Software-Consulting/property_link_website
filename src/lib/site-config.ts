@@ -32,7 +32,6 @@ export const siteConfig = {
   description:
     "PropertyLink NYC offers move-in-ready furnished apartments for stays of 30 days or more and 12-month leases across Manhattan. We own and manage every building we rent — from Little Italy to the Upper East Side.",
   tagline: "Owner-operated apartments in Manhattan.",
-  foundedYear: 2015,
   phone: {
     display: "888-622-0772",
     href: "tel:+18886220772",

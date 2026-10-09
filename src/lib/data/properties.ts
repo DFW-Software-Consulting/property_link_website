@@ -17,14 +17,6 @@ export const properties: Property[] = [
       "A historic Bowery streetscape steps from the Grand St subway, with SoHo and NoHo at your door.",
   },
   {
-    slug: "134-136-bowery",
-    name: "134&136 Bowery",
-    neighborhood: "Bowery",
-    // TODO: placeholder — swap for a real 134&136 Bowery photo once one exists.
-    image: "/images/properties/138-bowery.jpg",
-    blurb: "Commercial space on the Bowery with retail, office, and loft units.",
-  },
-  {
     slug: "521-west-48",
     name: "521 West 48th Street",
     neighborhood: "Hell's Kitchen",
@@ -71,5 +63,13 @@ export const properties: Property[] = [
     image: "/images/properties/407-west-51.jpg",
     blurb:
       "Close to Broadway theaters and Restaurant Row in Hell's Kitchen.",
+  },
+  {
+    slug: "45-west-81",
+    name: "45 West 81st Street",
+    neighborhood: "Upper West Side",
+    image: "/images/properties/45-west-81.jpg",
+    blurb:
+      "A gut-renovated historic building on one of the Upper West Side's most iconic blocks.",
   },
 ];
