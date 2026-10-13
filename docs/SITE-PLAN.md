@@ -157,7 +157,7 @@ CONTACT_FROM=PropertyLink NYC <info@propertylinknyc.com>
 
 The 7 real building photos + hero were downloaded from the legacy Wix CDN into `/public/images/`.
 `next.config.ts` also allowlists `static.wixstatic.com` as a fallback. Cards normalize mixed source
-orientations via a 4:3 `AspectRatio` + `object-cover`.
+orientations via a 3:4 portrait `AspectRatio` + `object-cover`.
 
 | Asset | Local path | Used on |
 |-------|-----------|---------|
