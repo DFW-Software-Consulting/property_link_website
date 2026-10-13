@@ -20,7 +20,7 @@ export function CmsBuildingCard({
       href={`/residences/${building.slug}`}
       className="group flex flex-col overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10 transition-shadow hover:shadow-lg focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
     >
-      <AspectRatio ratio={4 / 3} className="overflow-hidden bg-muted">
+      <AspectRatio ratio={3 / 4} className="overflow-hidden bg-muted">
         {building.hero ? (
           <Image
             src={cmsImageUrl(building.hero.thumbUrl)}

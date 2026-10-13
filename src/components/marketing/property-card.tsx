@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 export function PropertyCard({ property }: { property: Property }) {
   return (
     <article className="group flex flex-col overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10 transition-shadow hover:shadow-lg">
-      <AspectRatio ratio={4 / 3} className="overflow-hidden">
+      <AspectRatio ratio={3 / 4} className="overflow-hidden">
         <Image
           src={property.image}
           alt={`${property.name} building exterior in ${property.neighborhood}`}

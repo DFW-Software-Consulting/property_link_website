@@ -21,7 +21,7 @@ export default function LongTermRentalsLoading() {
                 key={i}
                 className="flex flex-col overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10"
               >
-                <div className="aspect-[4/3] w-full animate-pulse bg-muted" />
+                <div className="aspect-[3/4] w-full animate-pulse bg-muted" />
                 <div className="flex flex-col gap-3 p-5">
                   <div className="h-5 w-24 animate-pulse rounded-full bg-muted" />
                   <div className="h-5 w-2/3 animate-pulse rounded bg-muted" />
