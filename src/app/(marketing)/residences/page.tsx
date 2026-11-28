@@ -9,7 +9,11 @@ import { CtaBand } from "@/components/marketing/cta-band";
 import { CmsBuildingCard } from "@/components/marketing/cms-building-card";
 import { ListingFilters } from "@/components/marketing/listing-filters";
 import { JsonLd, buildingsItemListJsonLd } from "@/lib/seo/json-ld";
-import { listCmsBuildings } from "@/lib/cms/client";
+import {
+  getSiteCopyBody,
+  listCmsBuildings,
+  listCmsSiteCopy,
+} from "@/lib/cms/client";
 import {
   filterAndSortBuildings,
   normalizeSort,
@@ -41,15 +45,24 @@ type SearchParams = Promise<{
   sort?: string;
 }>;
 
+const DEFAULT_LONG_TERM_INTRO =
+  "Each building below is one we own and manage end-to-end, with 12-month leases and furnished stays of 30 days or more available. Explore a property to see its available layouts, then reach out and we'll match you to the right home.";
+
 export default async function LongTermRentalsPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
-  const [params, buildings] = await Promise.all([
+  const [params, buildings, siteCopy] = await Promise.all([
     searchParams,
     listCmsBuildings(),
+    listCmsSiteCopy(),
   ]);
+  const introDescription = getSiteCopyBody(
+    siteCopy,
+    "long-term-intro",
+    DEFAULT_LONG_TERM_INTRO,
+  );
 
   const neighborhoods = uniqueNeighborhoods(buildings);
   const current = {
@@ -73,7 +86,7 @@ export default async function LongTermRentalsPage({
             as="h1"
             eyebrow="Residences"
             title="Find your home in Manhattan"
-            description="Each building below is one we own and manage end-to-end, with 12-month leases and furnished stays of 30 days or more available. Explore a property to see its available layouts, then reach out and we'll match you to the right home."
+            description={introDescription}
           />
         </Container>
       </Section>

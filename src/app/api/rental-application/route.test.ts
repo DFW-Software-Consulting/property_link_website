@@ -160,6 +160,22 @@ describe("POST /api/rental-application", () => {
     );
   });
 
+  it("escapes HTML special characters in interpolated fields", async () => {
+    const res = await POST(
+      makeRequest(
+        makeForm({
+          fullName: '<b>Jane</b> & "Co"',
+          message: "<script>alert(1)</script>",
+        }),
+      ),
+    );
+    expect(res.status).toBe(201);
+    const call = mockSendEmail.mock.calls[0]?.[0];
+    expect(call?.html).toContain("&lt;b&gt;Jane&lt;/b&gt; &amp; &quot;Co&quot;");
+    expect(call?.html).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
+    expect(call?.html).not.toContain("<script>");
+  });
+
   it("tracks rate limits per IP from the x-forwarded-for header", async () => {
     const form = makeForm();
     for (let i = 0; i < 5; i++) {

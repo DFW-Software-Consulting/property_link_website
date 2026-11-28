@@ -40,10 +40,20 @@ export async function POST(request: Request) {
       ? body.slug.trim()
       : undefined;
 
-  // The listing + sitemap always change when published inventory changes.
-  const revalidated: string[] = ["/residences", "/sitemap.xml"];
-  revalidatePath("/residences");
-  revalidatePath("/sitemap.xml");
+  // The listing, homepage/about/contact social proof, short-term stays, and
+  // sitemap may all reflect CMS updates (buildings, reviews, trusted companies,
+  // company info, or site-copy).
+  const revalidated: string[] = [
+    "/",
+    "/residences",
+    "/short-term-stays",
+    "/about",
+    "/contact",
+    "/sitemap.xml",
+  ];
+  for (const path of revalidated) {
+    revalidatePath(path);
+  }
 
   if (slug) {
     const path = `/residences/${slug}`;

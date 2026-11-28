@@ -92,6 +92,15 @@ const cmsReviewSchema = z.object({
   rating: z.number().int().min(1).max(5),
 });
 
+/**
+ * Editable page-level marketing copy slots managed in the Emmut CMS.
+ */
+const cmsSiteCopyItemSchema = z.object({
+  key: z.string().min(1),
+  label: z.string(),
+  body: z.string(),
+});
+
 /** Envelope wrappers — the API returns `{ data: ... }`. */
 export const cmsBuildingsResponseSchema = z.object({
   data: z.array(cmsBuildingSummarySchema),
@@ -104,6 +113,9 @@ export const cmsTrustedCompaniesResponseSchema = z.object({
 export const cmsReviewsResponseSchema = z.object({
   data: z.array(cmsReviewSchema),
 });
+export const cmsSiteCopyResponseSchema = z.object({
+  data: z.array(cmsSiteCopyItemSchema),
+});
 export const maintenanceUnitInventoryResponseSchema = z.object({
   data: maintenanceUnitInventorySchema,
 });
@@ -115,6 +127,7 @@ export type CmsBuilding = z.infer<typeof cmsBuildingSchema>;
 export type CmsCompanyInfo = z.infer<typeof cmsCompanyInfoSchema>;
 export type CmsTrustedCompany = z.infer<typeof cmsTrustedCompanySchema>;
 export type CmsReview = z.infer<typeof cmsReviewSchema>;
+export type CmsSiteCopyItem = z.infer<typeof cmsSiteCopyItemSchema>;
 export type MaintenanceUnitBuilding = z.infer<
   typeof maintenanceUnitBuildingSchema
 >;
