@@ -3,8 +3,10 @@ import {
   cmsImageUrl,
   getCmsBuilding,
   getPublicMaintenanceUnitInventory,
+  getSiteCopyBody,
   listCmsBuildings,
   listCmsReviews,
+  listCmsSiteCopy,
   listCmsTrustedCompanies,
 } from "../client";
 
@@ -159,5 +161,38 @@ describe("listCmsReviews", () => {
       throw new Error("network down");
     });
     expect(await listCmsReviews()).toEqual([]);
+  });
+});
+
+describe("listCmsSiteCopy & getSiteCopyBody", () => {
+  const slot = {
+    key: "short-term-intro",
+    label: "Short-Term Stays — Intro",
+    body: "Updated furnished stays copy.",
+  };
+
+  it("returns validated site copy slots", async () => {
+    mockFetch(async () => okJson({ data: [slot] }));
+    expect(await listCmsSiteCopy()).toEqual([slot]);
+  });
+
+  it("returns [] when the endpoint fails or returns invalid data", async () => {
+    mockFetch(async () => new Response("error", { status: 500 }));
+    expect(await listCmsSiteCopy()).toEqual([]);
+
+    mockFetch(async () => okJson({ data: [{ key: "", label: "x", body: "y" }] }));
+    expect(await listCmsSiteCopy()).toEqual([]);
+  });
+
+  it("picks the matching slot body or falls back when missing or blank", () => {
+    expect(getSiteCopyBody([slot], "short-term-intro", "Fallback")).toBe(
+      "Updated furnished stays copy.",
+    );
+    expect(
+      getSiteCopyBody([{ ...slot, body: "   " }], "short-term-intro", "Fallback"),
+    ).toBe("Fallback");
+    expect(getSiteCopyBody([slot], "long-term-intro", "Fallback")).toBe(
+      "Fallback",
+    );
   });
 });

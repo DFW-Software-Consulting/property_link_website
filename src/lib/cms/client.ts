@@ -21,6 +21,7 @@ import {
   cmsBuildingsResponseSchema,
   cmsCompanyInfoResponseSchema,
   cmsReviewsResponseSchema,
+  cmsSiteCopyResponseSchema,
   cmsTrustedCompaniesResponseSchema,
   maintenanceUnitInventoryResponseSchema,
 } from "./schema";
@@ -29,6 +30,7 @@ import type {
   CmsBuildingSummary,
   CmsCompanyInfo,
   CmsReview,
+  CmsSiteCopyItem,
   CmsTrustedCompany,
   MaintenanceUnitInventory,
 } from "./types";
@@ -156,6 +158,33 @@ export async function listCmsReviews(): Promise<CmsReview[]> {
     });
     return [];
   }
+}
+
+/**
+ * Editable marketing copy slots managed in the CMS. Returns an empty list
+ * (never throws) so pages seamlessly fall back to their built-in copy.
+ */
+export async function listCmsSiteCopy(): Promise<CmsSiteCopyItem[]> {
+  try {
+    const json = await fetchCmsJson("/api/public/cms/site-copy");
+    return cmsSiteCopyResponseSchema.parse(json).data;
+  } catch (error) {
+    cmsLogger.error("failed to list site copy", error, {
+      operation: "listSiteCopy",
+    });
+    return [];
+  }
+}
+
+/** Look up a CMS site-copy slot by key, falling back when unset or blank. */
+export function getSiteCopyBody(
+  items: readonly CmsSiteCopyItem[],
+  key: string,
+  fallback: string,
+): string {
+  const match = items.find((item) => item.key === key);
+  const trimmed = match?.body.trim();
+  return trimmed ? trimmed : fallback;
 }
 
 /**

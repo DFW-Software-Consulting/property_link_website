@@ -62,10 +62,22 @@ describe("POST /api/revalidate", () => {
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
-      revalidated: ["/residences", "/sitemap.xml", "/residences/100-main"],
+      revalidated: [
+        "/",
+        "/residences",
+        "/short-term-stays",
+        "/about",
+        "/contact",
+        "/sitemap.xml",
+        "/residences/100-main",
+      ],
     });
     expect(mocks.revalidatePath.mock.calls).toEqual([
+      ["/"],
       ["/residences"],
+      ["/short-term-stays"],
+      ["/about"],
+      ["/contact"],
       ["/sitemap.xml"],
       ["/residences/100-main"],
     ]);
@@ -78,10 +90,22 @@ describe("POST /api/revalidate", () => {
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
-      revalidated: ["/residences", "/sitemap.xml", "/residences/[slug]"],
+      revalidated: [
+        "/",
+        "/residences",
+        "/short-term-stays",
+        "/about",
+        "/contact",
+        "/sitemap.xml",
+        "/residences/[slug]",
+      ],
     });
     expect(mocks.revalidatePath.mock.calls).toEqual([
+      ["/"],
       ["/residences"],
+      ["/short-term-stays"],
+      ["/about"],
+      ["/contact"],
       ["/sitemap.xml"],
       ["/residences/[slug]", "page"],
     ]);
@@ -101,7 +125,15 @@ describe("POST /api/revalidate", () => {
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
-      revalidated: ["/residences", "/sitemap.xml", "/residences/[slug]"],
+      revalidated: [
+        "/",
+        "/residences",
+        "/short-term-stays",
+        "/about",
+        "/contact",
+        "/sitemap.xml",
+        "/residences/[slug]",
+      ],
     });
     expect(mocks.revalidatePath).toHaveBeenLastCalledWith(
       "/residences/[slug]",

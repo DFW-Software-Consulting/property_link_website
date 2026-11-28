@@ -8,7 +8,11 @@ import { Button } from "@/components/ui/button";
 import { CtaBand } from "@/components/marketing/cta-band";
 import { CmsBuildingCard } from "@/components/marketing/cms-building-card";
 import { ListingFilters } from "@/components/marketing/listing-filters";
-import { listCmsBuildings } from "@/lib/cms/client";
+import {
+  getSiteCopyBody,
+  listCmsBuildings,
+  listCmsSiteCopy,
+} from "@/lib/cms/client";
 import {
   filterAndSortBuildings,
   normalizeSort,
@@ -40,15 +44,24 @@ type SearchParams = Promise<{
   sort?: string;
 }>;
 
+const DEFAULT_SHORT_TERM_INTRO =
+  "Fully furnished, move-in-ready homes for stays of 30 days or more — ideal for relocations, renovations, and extended visits. Every building below is one we own and manage end-to-end; explore a property and we'll match you to the right home for your dates.";
+
 export default async function ShortTermStaysPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
-  const [params, buildings] = await Promise.all([
+  const [params, buildings, siteCopy] = await Promise.all([
     searchParams,
     listCmsBuildings(),
+    listCmsSiteCopy(),
   ]);
+  const introDescription = getSiteCopyBody(
+    siteCopy,
+    "short-term-intro",
+    DEFAULT_SHORT_TERM_INTRO,
+  );
 
   const neighborhoods = uniqueNeighborhoods(buildings);
   const current = {
@@ -67,7 +80,7 @@ export default async function ShortTermStaysPage({
             as="h1"
             eyebrow="Short-term stays"
             title="Furnished short-term stays in Manhattan, 30+ days"
-            description="Fully furnished, move-in-ready homes for stays of 30 days or more — ideal for relocations, renovations, and extended visits. Every building below is one we own and manage end-to-end; explore a property and we'll match you to the right home for your dates."
+            description={introDescription}
           />
         </Container>
       </Section>

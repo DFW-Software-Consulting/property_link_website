@@ -8,6 +8,18 @@ import { rentalApplicationSchema } from "@/lib/schemas/rental-application";
 
 export const runtime = "nodejs";
 
+const HTML_ESCAPE_MAP: Record<string, string> = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;",
+};
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (ch) => HTML_ESCAPE_MAP[ch] ?? ch);
+}
+
 const RATE_LIMIT = 5;
 const WINDOW_MS = 10 * 60 * 1000;
 const hits = new Map<string, { count: number; resetAt: number }>();
@@ -120,13 +132,13 @@ export async function POST(request: Request) {
     .filter(([, value]) => value)
     .map(
       ([label, value]) =>
-        `<tr><td style="padding:4px 12px 4px 0;font-weight:600">${label}</td><td>${value}</td></tr>`,
+        `<tr><td style="padding:4px 12px 4px 0;font-weight:600">${escapeHtml(label)}</td><td>${escapeHtml(value ?? "")}</td></tr>`,
     )
     .join("");
 
   const html = `<table style="border-collapse:collapse">${htmlRows}</table>${
     message
-      ? `<hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0"/><p style="font-weight:700;margin:0 0 4px">Message</p><p style="white-space:pre-wrap;margin:0">${message}</p>`
+      ? `<hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0"/><p style="font-weight:700;margin:0 0 4px">Message</p><p style="white-space:pre-wrap;margin:0">${escapeHtml(message)}</p>`
       : ""
   }`;
 
