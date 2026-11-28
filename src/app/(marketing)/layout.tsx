@@ -1,5 +1,7 @@
+import { LeasingConciergeWidget } from "@/components/concierge/leasing-concierge-widget";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { checkConciergeEnabled } from "@/lib/concierge/client";
 import { getSiteContactInfo } from "@/lib/contact-info";
 
 export default async function MarketingLayout({
@@ -7,7 +9,10 @@ export default async function MarketingLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const contact = await getSiteContactInfo();
+  const [contact, conciergeEnabled] = await Promise.all([
+    getSiteContactInfo(),
+    checkConciergeEnabled(),
+  ]);
 
   return (
     <>
@@ -22,6 +27,7 @@ export default async function MarketingLayout({
         {children}
       </main>
       <SiteFooter contact={contact} />
+      {conciergeEnabled ? <LeasingConciergeWidget /> : null}
     </>
   );
 }
